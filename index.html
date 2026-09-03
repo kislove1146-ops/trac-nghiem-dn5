@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Sát Hạch Trắc Nghiệm - NMTĐ Đồng Nai 5</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        evn: '#0f4c81',
+                        evnDark: '#0a3258',
+                        evnLight: '#0284c7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- HEADER EVN -->
+    <header class="bg-evn text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white text-evn flex items-center justify-center font-black text-xl shadow">
+                    <i class="fa-solid fa-bolt text-amber-500"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-extrabold uppercase tracking-wide">THỦY ĐIỆN ĐỒNG NAI 5</h1>
+                    <p class="text-xs text-blue-200">Ngân Hàng Đề Thi Trắc Nghiệm Trưởng Kíp, ĐHV & An Toàn Điện</p>
+                </div>
+            </div>
+            
+            <div id="header-user-badge" class="hidden sm:flex items-center gap-3 text-right">
+                <div class="text-xs">
+                    <div id="nav-user-name" class="font-bold text-white">Thí sinh</div>
+                    <div id="nav-exam-name" class="text-blue-200">Bộ đề: Đề 01</div>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-grow">
+
+        <!-- 1. MÀN HÌNH CẤU HÌNH & CHỌN ĐỀ -->
+        <section id="config-screen" class="max-w-xl mx-auto bg-white rounded-3xl shadow-xl p-8 sm:p-10 border border-slate-100 my-4">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-4 bg-sky-50 text-evn rounded-2xl mb-4 shadow-sm">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight uppercase">
+                    HỆ THỐNG SÁT HẠCH TRỰC TUYẾN
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                    10 Bộ Đề Sát Hạch Chuẩn Hóa 30 Câu - Bao Phủ Toàn Bộ Ngân Hàng Câu Hỏi
+                </p>
+            </div>
+
+            <!-- KHỐI QUẢN LÝ CÂU SAI -->
+            <div id="wrong-pool-box" class="mb-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2.5 text-amber-900">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+                    <span>Bạn đang có <b id="wrong-questions-count" class="text-red-600 text-sm">0</b> câu làm sai chưa ôn lại.</span>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" id="btn-practice-wrong-main" class="flex-1 sm:flex-none px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-rotate-left"></i> Làm lại câu sai
+                    </button>
+                    <button type="button" id="btn-clear-wrong-main" title="Xóa toàn bộ câu sai đã lưu" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-trash-can"></i> Xóa
+                    </button>
+                </div>
+            </div>
+
+            <form id="quiz-setup-form" class="space-y-5">
+                <input type="hidden" id="student-name" value="Thí sinh">
+                <input type="hidden" id="student-role" value="Điều Hành Viên">
+                <input type="hidden" id="server-url" value="http://localhost:5000/api/submit-quiz">
+
+                <!-- Chọn Bộ Đề Kiểm Tra -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-2">
+                        Chọn Bộ Đề Kiểm Tra (Chuẩn 30 Câu / Đề)
+                    </label>
+                    <div class="relative">
+                        <select id="quiz-select-mode" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-evnLight focus:border-transparent outline-none transition bg-white appearance-none cursor-pointer pr-10 shadow-sm">
+                            <option value="random">🎲 ĐỀ THI NGẪU NHIÊN (Tự động bốc ngẫu nhiên 30 câu từ toàn bộ ngân hàng)</option>
+                            <option value="1">📋 BỘ ĐỀ 01 - Chuẩn 30 câu (Vận hành thiết bị & An toàn điện)</option>
+                            <option value="2">📋 BỘ ĐỀ 02 - Chuẩn 30 câu (Khí nén, Ổ đỡ & Quy trình Phiếu)</option>
+                            <option value="3">📋 BỘ ĐỀ 03 - Chuẩn 30 câu (Rơle Bảo vệ MBT, Máy phát & Trạm 220kV)</option>
+                            <option value="4">📋 BỘ ĐỀ 04 - Chuẩn 30 câu (Hệ thống Điều tốc & Kích từ ĐN5)</option>
+                            <option value="5">📋 BỘ ĐỀ 05 - Chuẩn 30 câu (Quy trình An toàn Điện EVN & Tiếp đất)</option>
+                            <option value="6">📋 BỘ ĐỀ 06 - Chuẩn 30 câu (Trình tự Bảo vệ Sự cố 40, 46, 51T, 59)</option>
+                            <option value="7">📋 BỘ ĐỀ 07 - Chuẩn 30 câu (Thao tác Thiết bị & Chế độ Vận hành)</option>
+                            <option value="8">📋 BỘ ĐỀ 08 - Chuẩn 30 câu (Quy trình Công tác Nhiều ngày & Di chuyển)</option>
+                            <option value="9">📋 BỘ ĐỀ 09 - Chuẩn 30 câu (Logic Khởi động Dừng máy & Tự dùng LCU)</option>
+                            <option value="10">📋 BỘ ĐỀ 10 - Chuẩn 30 câu (Tổng hợp Sát hạch Trưởng Kíp / ĐHV)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thời Gian Làm Bài -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-2">
+                        Thời Gian Làm Bài (Tùy chỉnh phút)
+                    </label>
+                    <div class="relative w-full">
+                        <input type="number" id="quiz-duration" min="5" max="180" value="45" required
+                            class="w-full pl-4 pr-16 py-3 rounded-xl border border-slate-200 text-sm font-extrabold text-slate-900 focus:ring-2 focus:ring-evnLight focus:border-transparent outline-none transition shadow-sm">
+                        <span class="absolute right-4 top-3 text-xs sm:text-sm font-medium text-slate-400 select-none">phút</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-evn hover:bg-evnDark text-white font-black rounded-2xl shadow-lg transition duration-200 flex items-center justify-center gap-2.5 text-sm uppercase tracking-wider mt-4">
+                    <span>VÀO PHÒNG THI & BẮT ĐẦU</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- 2. MÀN HÌNH THI TRỰC TUYẾN -->
+        <section id="exam-screen" class="hidden">
+            <div class="bg-white rounded-2xl shadow-md p-4 mb-6 border border-slate-200 flex flex-wrap items-center justify-between gap-4 sticky top-16 z-40">
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-lg border border-red-200">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <div>
+                        <div class="text-[11px] uppercase tracking-wider text-slate-400 font-extrabold">Thời gian còn lại</div>
+                        <div id="countdown-timer" class="text-2xl font-mono font-black text-red-600 leading-none mt-0.5">45:00</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-5">
+                    <div class="text-sm hidden sm:block">
+                        <span class="text-slate-400">Tiến độ làm bài:</span>
+                        <span id="answered-count" class="font-extrabold text-evn">0</span>/<span id="total-q-count-badge" class="font-bold">30 câu</span>
+                    </div>
+                    <button id="btn-submit-exam" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Nộp Bài Thi</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-3xl shadow-md p-6 sm:p-8 border border-slate-200">
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                            <span id="current-q-badge" class="px-3 py-1 bg-blue-50 text-evn font-black text-xs rounded-full uppercase">Câu 1 / 30</span>
+                            <span id="current-q-origin-id" class="text-xs text-slate-400 font-semibold">Gốc: Câu 1</span>
+                        </div>
+
+                        <h3 id="current-question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed mb-6">
+                            Đang nạp câu hỏi...
+                        </h3>
+
+                        <div id="answer-options-container" class="space-y-3">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+                            <button id="btn-prev-q" class="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                                <i class="fa-solid fa-chevron-left"></i> Câu Trước
+                            </button>
+                            <button id="btn-flag-q" class="px-4 py-2.5 text-amber-600 hover:bg-amber-50 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fa-regular fa-bookmark" id="flag-icon"></i>
+                                <span id="flag-text">Đánh dấu nghi ngờ</span>
+                            </button>
+                            <button id="btn-next-q" class="px-5 py-2.5 bg-evn hover:bg-evnDark text-white rounded-xl text-sm font-bold transition flex items-center gap-2">
+                                <span>Câu Tiếp</span> <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-3xl shadow-md p-5 border border-slate-200 sticky top-36">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-extrabold text-xs text-slate-600 uppercase tracking-wider">Danh Sách Câu Hỏi</h4>
+                            <span id="palette-exam-id" class="text-xs font-bold text-evn">Đề 01</span>
+                        </div>
+                        
+                        <div id="palette-container" class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto p-1 custom-scroll">
+                            <!-- Injected buttons -->
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-slate-100 text-[11px] space-y-2 text-slate-500 font-medium">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded bg-evn"></span> <span>Đang mở</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded bg-emerald-500"></span> <span>Đã chọn đáp án</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded bg-amber-400"></span> <span>Đánh dấu xem lại</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded bg-slate-100 border border-slate-300"></span> <span>Chưa trả lời</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. MÀN HÌNH KẾT QUẢ & REVIEW ĐÁP ÁN -->
+        <section id="result-screen" class="hidden max-w-4xl mx-auto space-y-8">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 text-center">
+                <div class="bg-gradient-to-r from-evn to-evnLight p-8 text-white relative">
+                    <h2 class="text-2xl sm:text-3xl font-black uppercase mb-1">KẾT QUẢ SÁT HẠCH TRỰC TUYẾN</h2>
+                    <p id="res-student-info" class="text-blue-100 text-sm font-medium">Thí sinh: Vận hành ĐN5</p>
+                </div>
+
+                <div class="p-6 sm:p-8">
+                    <div class="flex flex-wrap justify-center items-center gap-6 sm:gap-12 mb-8">
+                        <div class="text-center">
+                            <div class="text-4xl sm:text-5xl font-black text-evn" id="res-score">0.0</div>
+                            <div class="text-xs uppercase font-extrabold text-slate-400 mt-1">Thang Điểm 10</div>
+                        </div>
+                        <div class="h-12 w-px bg-slate-200 hidden sm:block"></div>
+                        <div class="text-center">
+                            <div class="text-3xl sm:text-4xl font-black text-emerald-600" id="res-correct-count">0/30</div>
+                            <div class="text-xs uppercase font-extrabold text-slate-400 mt-1">Số Câu Đúng</div>
+                        </div>
+                        <div class="h-12 w-px bg-slate-200 hidden sm:block"></div>
+                        <div class="text-center">
+                            <div class="text-3xl sm:text-4xl font-black text-slate-700" id="res-time-taken">00:00</div>
+                            <div class="text-xs uppercase font-extrabold text-slate-400 mt-1">Thời Gian Làm</div>
+                        </div>
+                        <div class="h-12 w-px bg-slate-200 hidden sm:block"></div>
+                        <div class="text-center">
+                            <span id="res-badge-status" class="inline-block px-5 py-2.5 rounded-2xl text-sm font-black uppercase tracking-wider">ĐẠT</span>
+                            <div class="text-xs uppercase font-extrabold text-slate-400 mt-1">Kết Luận</div>
+                        </div>
+                    </div>
+
+                    <div id="result-wrong-alert" class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-left">
+                        <div class="text-amber-900">
+                            <i class="fa-solid fa-circle-exclamation text-amber-600 mr-1.5"></i>
+                            <span id="result-wrong-text">Hệ thống đã lưu các câu bạn làm sai vào danh sách ôn tập.</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="btn-practice-wrong-result" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate-left"></i> Làm lại ngay câu sai
+                            </button>
+                            <button type="button" id="btn-clear-wrong-result" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash-can"></i> Xóa câu sai
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="server-sync-feedback" class="mb-6 p-4 rounded-2xl text-xs font-mono text-left bg-slate-50 border border-slate-200">
+                        Đang kết nối gửi kết quả đến máy chủ localhost...
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button id="btn-scroll-review" class="px-6 py-3 bg-evnLight hover:bg-sky-700 text-white rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-list-check"></i> Xem Chi Tiết Đáp Án Từng Câu
+                        </button>
+                        <button id="btn-restart-quiz" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-right"></i> Chọn Đề Thi Khác
+                        </button>
+                        <button onclick="window.print()" class="px-5 py-3 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> In Kết Quả Sát Hạch
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="review-container" class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-evn"></i>
+                        <span>Chi Tiết Toàn Bộ Câu Hỏi & Đối Soát Đáp Án Chuẩn</span>
+                    </h3>
+                </div>
+                <div id="review-list" class="space-y-4">
+                    <!-- Injected questions review -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-400 font-medium">
+        Hệ thống ôn luyện & sát hạch trực tuyến chức danh Trưởng kíp, ĐHV - Công ty Thủy điện Đồng Nai 5
+    </footer>
+
+    <!-- SCRIPT XỬ LÝ & TOÀN BỘ CƠ SỞ DỮ LIỆU TỪ FILE PDF -->
+    <script>
+        /* ==================== 1. TOÀN BỘ DỮ LIỆU CHUẨN XÁC TỪ FILE PDF ==================== */
+        const MASTER_QUESTIONS = [
+            { id: 1, q: "Bộ làm mát gió máy phát Đồng Nai 5 được trang bị bao nhiêu cái:", options: ["6 cái", "7 cái", "8 cái", "9 cái"], correct: 2 },
+            { id: 2, q: "Nhiệt độ Alarm gió lạnh máy phát Đồng Nai 5 là bao nhiêu °C:", options: ["40°C", "45°C", "50°C", "Tất cả đều sai"], correct: 1 },
+            { id: 3, q: "Nhiệt độ Trip gió lạnh máy phát máy phát Đồng Nai 5 là bao nhiêu độ:", options: ["50°C", "55°C", "60°C", "Tất cả đều sai"], correct: 0 },
+            { id: 4, q: "Nhiệt độ Alarm gió nóng máy phát Đồng Nai 5 là bao nhiêu °C:", options: ["55°C", "60°C", "75°C", "Tất cả đều sai"], correct: 2 },
+            { id: 5, q: "Nhiệt độ Trip gió nóng máy phát máy phát Đồng Nai 5 là bao nhiêu độ:", options: ["65°C", "70°C", "80°C", "Tất cả đều sai"], correct: 2 },
+            { id: 6, q: "Áp lực khởi động và dừng máy nén khí cao áp làm việc chính là bao nhiêu:", options: ["Khởi động là 6.8Mpa, dừng là 7.0 Mpa.", "Khởi động là 6.7Mpa, dừng là 7.2Mpa.", "Khởi động là 6.9Mpa, dừng là 7.0Mpa.", "Khởi động là 6.6Mpa, dừng là 7.1Mpa."], correct: 0 },
+            { id: 7, q: "Áp lực tác động van an toàn của máy nén khí cao áp:", options: ["7.8Mpa", "7.9Mpa", "7.5Mpa", "8.1Mpa"], correct: 2 },
+            { id: 8, q: "Áp lực khí báo Alarm áp lực thấp của máy nén khí hạ áp là bao nhiêu?", options: ["0.55Mpa", "0.60Mpa", "0.70Mpa", "0.65Mpa"], correct: 0 },
+            { id: 9, q: "Khí cao áp có nhiệm vụ:", options: ["Cung cấp khí cho điều tốc", "Cung cấp khí cho các tầng sàn", "Cung cấp khí cho hệ thống thắng tổ máy", "Tất cả đều sai"], correct: 0 },
+            { id: 10, q: "Chức năng của dầu trong các ổ đỡ, OHT, OHD, OHTB của tổ máy:", options: ["Có tác dụng bôi trơn", "Có tác dụng cách điện", "Có tác dụng làm mát", "Tất cả đều đúng"], correct: 3 },
+            { id: 11, q: "Nhiệt độ báo Alarm và Trip của nhiệt độ dầu OHT là bao nhiêu?", options: ["Alarm là 50°C, Trip là 55°C", "Alarm là 35°C, Trip là 40°C", "Alarm là 45°C, Trip là 50°C", "Alarm là 45°C, Trip là 45°C"], correct: 0 },
+            { id: 12, q: "Nhiệt độ báo Alarm và Trip của nhiệt độ dầu ổ đỡ, OHD là bao nhiêu?", options: ["Alarm là 50°C, Trip là 55°C", "Alarm là 35°C, Trip là 40°C", "Alarm là 45°C, Trip là 50°C", "Alarm là 45°C, Trip là 45°C"], correct: 0 },
+            { id: 13, q: "Nhiệt độ báo Alarm và Trip của nhiệt độ dầu OHTB là bao nhiêu?", options: ["Alarm là 50°C, Trip là 55°C", "Alarm là 40°C, Trip là 45°C", "Alarm là 45°C, Trip là 50°C", "Alarm là 45°C, Trip là 50°C"], correct: 0 },
+            { id: 14, q: "Các chức năng chính bảo vệ phát tuyến 271 Đồng Nai 5-500kV Đắk Nông:", options: ["Chức năng 87L, 21/21N, 67/67N, 50/51N, 25/79, 50BF, 50S.", "Chức năng 87L, 21/21N.", "Chức năng 87L, 21/21N, 67/67N, 50/51, 50/51N, 25/79.", "Chức năng 50/51, 50/51N, 25/79."], correct: 1 },
+            { id: 15, q: "Quy định về giám sát an toàn trong thời gian làm việc:", options: ["Giám sát an toàn điện và an toàn trong khi làm việc đối với tất cả nhân viên đơn vị công tác thuộc trách nhiệm của Người giám sát an toàn điện.", "Người sử dụng lao động, cán bộ an toàn của đơn vị làm công việc không cần kiểm tra việc thực hiện giám sát đảm bảo an toàn trong khi làm việc.", "Tuỳ theo nhiệm vụ công việc, điều kiện làm việc người chỉ huy trực tiếp được phép đồng thời vừa làm việc, vừa giám sát an toàn, nhưng phải thực hiện việc giám sát an toàn là chính.", "Nếu để xảy ra mất an toàn do lỗi không thực hiện giám sát nhân viên đơn vị công tác trong khi tiến hành công việc thì Người lãnh đạo công việc phải chịu hoàn toàn trách nhiệm trước pháp luật."], correct: 2 },
+            { id: 16, q: "Những người được duyệt PTT theo kế hoạch tại nhà máy điện?", options: ["Người duyệt phiếu là Giám đốc, Phó Giám đốc nhà máy; Quản đốc, Phó Quản đốc Phân xưởng Vận hành nhà máy điện hoặc người được ủy quyền.", "Người duyệt phiếu là Giám đốc, Phó Giám đốc nhà máy; Quản đốc, Phó Quản đốc Phân xưởng Vận hành, Trưởng, Phó phòng Kỹ thuật - An toàn nhà máy điện hoặc người được ủy quyền.", "Giám đốc, Phó Giám đốc nhà máy; Quản đốc, Phó Quản đốc Phân xưởng Vận hành nhà máy điện; Trưởng ca.", "Quản đốc, Phó Quản đốc Phân xưởng Vận hành nhà máy điện; Trưởng ca, Trưởng kíp."], correct: 0 },
+            { id: 17, q: "Nối đất trong trạm biến áp:", options: ["Nối đất an toàn.", "Nối đất làm việc.", "Nối đất chống sét", "Bao gồm nối đất an toàn, nối đất làm việc, nối đất chống sét."], correct: 3 },
+            { id: 18, q: "Phát biểu nào sau đây đúng?", options: ["Đối với các thiết bị vật tư, văn phòng phẩm, máy fax, máy in, máy tính truy cập công tơ, máy điện thoại - bộ đàm, nước sinh hoạt... được theo dõi kiểm tra định kỳ hoặc trước ngày có công tác phải được kiểm tra chuẩn bị sẵn sàng và đầy đủ.", "Các ca vận hành và các đơn vị liên quan phải có trách nhiệm giữ gìn vệ sinh, bảo vệ cảnh quan toàn khu vực nhà máy, nếu các đơn vị hoặc cá nhân liên quan trong nhà máy cố tình vi phạm như vứt xả rác, các vật dụng cá nhân.... làm ảnh hưởng đến thiết bị hoặc mỹ quan trong toàn nhà máy sẽ bị xử lý.", "Trong quá trình kiểm tra, vệ sinh, vận hành chuyển đổi thiết bị nhân viên vận hành không phải ghi vào sổ nhật ký mà ghi các thông số vào biểu mẫu, nếu có công tác đột xuất trong ngày làm chưa xong hoặc chưa kịp thực hiện thì ghi lưu ý nội bộ và giao ca sau thực hiện tiếp.", "Ca đương phiên có trách nhiệm nhắc nhở các đơn vị công tác trong nhà máy dọn dẹp vệ sinh sau mỗi buổi công tác, nếu để đơn vị công tác làm mất vệ sinh thì trách nhiệm thuộc về đơn vị công tác."], correct: 1 },
+            { id: 19, q: "Phương pháp phổ biến nhất để có dòng điện một chiều là:", options: ["Chỉnh lưu dòng điện xoay chiều", "Chế tạo máy phát điện xoay chiều.", "A và B đều đúng.", "A và B đều sai."], correct: 0 },
+            { id: 20, q: "Tủ điều khiển LCU nào có chức năng điều khiển, giám sát hệ thống AC/DC, máy phát Diesel nhà máy?", options: ["LCU3", "LCU4.", "LCU5.", "Cả A, B, C đều sai."], correct: 0 },
+            { id: 21, q: "Ổ hướng Tua-bin Nhà máy Đồng Nai 5 có bao nhiêu RTD đo nhiệt độ Pad và dầu:", options: ["08 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu.", "07 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu.", "08 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu", "07 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu."], correct: 2 },
+            { id: 22, q: "Điều kiện interlock của 901 khi mở là:", options: ["901-05 đóng, 901-3 đóng.", "901-3 đóng.", "901-05 đóng, 901-3 mở.", "Tự do"], correct: 3 },
+            { id: 23, q: "Công suất định mức máy biến áp T1 NMTĐ Đồng Nai 5:", options: ["S = 90MVA", "S = 88MVA", "S = 75MVA", "S = 42MVA"], correct: 0 },
+            { id: 24, q: "Hệ thống dầu đập tràn có nhiệm vụ gì?", options: ["Điều khiển nâng/hạ và giữ cửa van cung tại vị trí mở", "Chỉ dùng để nâng cửa van cung.", "Điều khiển nâng/hạ cửa van cung.", "Tất cả đáp án trên"], correct: 0 },
+            { id: 25, q: "Những công việc nào khi làm việc cần phải có phiếu công tác:", options: ["Làm việc gần các thiết bị đang mang điện cao áp với khoảng cách cho phép.", "Những công việc làm ở xa thiết bị có điện.", "Sửa chữa và tháo, lắp đường cáp ngầm cao áp, đường dây nổi hoặc đấu chuyển từ các nhánh dây mới xây dựng vào đường dây trục của lưới.", "Đáp án A và C đúng"], correct: 3 },
+            { id: 26, q: "Khi kết thúc toàn bộ công việc khóa phiếu đóng điện nhưng phát hiện khiếm khuyết phức tạp, thời gian xử lý dài cần xử lý phải:", options: ["Cấp lại phiếu công tác khác để thực hiện công việc", "Làm thủ tục trên phiếu công tác đã khóa và cho phép đội công tác vào xử lý.", "Thực hiện xử lý theo lệnh công tác.", "Không cần ghi vào phiếu công tác, yêu cầu đội công tác tiến hành sửa chữa ngay các thiếu sót."], correct: 0 },
+            { id: 27, q: "Nghỉ hết ngày làm việc, người chỉ huy trực tiếp của đội công tác phải:", options: ["Làm thủ tục khóa phiếu công tác.", "Làm thủ tục khóa phiếu, giữ phiếu công tác và mang về.", "Làm thủ tục nghỉ hết ngày làm việc và giao lại phiếu công tác cho nhân viên vận hành giữ.", "Tất cả các đáp án trên đều đúng."], correct: 2 },
+            { id: 28, q: "Khi cấp phiếu công tác cho đội công tác:", options: ["Người cấp phiếu có thể ủy quyền cho người khác ghi ở các mục trong phiếu và chỉ việc ký tên và giao phiếu cho đội công tác.", "Người cấp phiếu phải tự ghi đầy đủ các mục trong phiếu theo quy định, ký tên và giao phiếu cho người cho phép.", "Người cấp phiếu giao người lãnh đạo công việc ghi và cấp phiếu cho đội công tác.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 29, q: "Ngày đầu tiên đến làm việc theo phiếu công tác, Nhân viên đội công tác phải:", options: ["Tự mình ký vào phiếu công tác.", "Ủy quyền cho Người chỉ huy trực tiếp ký.", "Ủy quyền cho Người đăng ký công tác ký.", "Nhờ người khác ký thay."], correct: 0 },
+            { id: 30, q: "Những công việc nào khi làm việc được phép làm theo lệnh công tác:", options: ["Xử lý sự cố thiết bị do nhân viên vận hành thực hiện trong ca trực.", "Những người khác thực hiện dưới sự giám sát của nhân viên vận hành.", "Làm việc ở xa nơi có điện.", "Tất cả các đáp án trên đều đúng."], correct: 3 },
+            { id: 31, q: "Trước khi cho đơn vị công tác vào làm việc ai chịu trách nhiệm giải thích về nội dung, trình tự thực hiện và các biện pháp an toàn?", options: ["Người chỉ huy trực tiếp.", "Người cấp phiếu.", "Người lãnh đạo công việc.", "Người cho phép."], correct: 3 },
+            { id: 32, q: "Nguyên tắc đặt dây tiếp đất:", options: ["Kiểm tra không còn điện sau đó đấu một đầu dây với dây dẫn trước và lắp đầu kia với đất sau.", "Phải đấu một đầu với đất trước, sau đó mới lắp đầu kia với dây dẫn không còn điện.", "Kiểm tra không còn điện sau đó đấu đồng thời một đầu vào dây dẫn và đầu kia nối với đất.", "Đầu đấu xuống đất cho phép được bắt kiểu vặn xoắn."], correct: 1 },
+            { id: 33, q: "Chức năng bảo vệ nào được xem là bảo vệ chính của MBT chính:", options: ["Chức năng 87GT", "Chức năng 87T", "Chức năng 87GT và 87T", "Không phải các chức năng trên"], correct: 1 },
+            { id: 34, q: "Trong quy trình vận hành liên hồ chứa trên sông Đồng Nai, thời gian mùa lũ đối với hồ Đồng Nai 5 được quy định như thế nào?", options: ["Từ ngày 01 tháng 06 đến 31 tháng 12", "Từ ngày 01 tháng 07 đến 31 tháng 12", "Từ ngày 01 tháng 08 đến 31 tháng 12", "Từ ngày 01 tháng 07 đến 30 tháng 11"], correct: 3 },
+            { id: 35, q: "Dao cách ly luôn luôn thực hiện được các thao tác có điện trong các trường hợp sau:", options: ["Dùng để đóng cắt mạch điện cao áp lúc không tải hoặc dòng điện nhỏ theo quy định của nhà chế tạo.", "Dùng để tạo khoảng cách an toàn trông thấy được.", "Đóng và cắt không tải các máy biến áp lực, các đường dây trên không, các đường cáp.", "Dùng để đóng, cắt mạch điện khi có dòng đi qua DCL nhỏ hơn dòng định mức của DCL."], correct: 0 },
+            { id: 36, q: "Bảo vệ quá điện áp máy phát 59 hiện nay:", options: ["Khi điện áp đầu cực máy phát tăng cao quá giá trị cài đặt 130% điện áp định mức và đủ thời gian trễ 0.5s thì bảo vệ 59 sẽ tác động.", "Khi điện áp đầu cực máy phát tăng cao quá giá trị cài đặt 180% điện áp định mức và đủ thời gian trễ 0.5s thì bảo vệ 59 sẽ tác động.", "Khi điện áp đầu cực máy phát tăng cao quá giá trị cài đặt 90% điện áp định mức và đủ thời gian trễ 0.5s thì bảo vệ 59 sẽ tác động.", "Khi điện áp đầu cực máy phát tăng cao quá giá trị cài đặt 70% điện áp định mức và đủ thời gian trễ 0.5s thì bảo vệ 59 sẽ tác động."], correct: 0 },
+            { id: 37, q: "Những công việc có cắt điện nhưng phải gỡ dây tiếp địa để công tác là:", options: ["Kiểm tra hệ thống tiếp địa của hệ thống trạm.", "Củng cố lại tiếp đất của thiết bị hoặc cả hệ thống trạm.", "Kiểm tra cách điện của các thiết bị.", "Cả 3 nội dung a, b, c đều đúng"], correct: 3 },
+            { id: 38, q: "Trường hợp nào sau đây đảm bảo cho phép đóng cắt thử máy cắt?", options: ["Các dao cách ly hai phía của máy cắt được cắt hoàn toàn và đóng hai dao tiếp địa ở hai phía của máy cắt này.", "Cho phép dao cách ly phía không điện của máy cắt đóng, nhưng phải cắt dao tiếp địa phía không điện của máy cắt.", "Các dao cách ly hai phía của máy cắt được cắt hoàn toàn và chỉ đóng dao tiếp địa, tiếp địa di động ở một phía của máy cắt này.", "a và b đều đúng."], correct: 2 },
+            { id: 39, q: "Khi cắt điện MBA phải đảm bảo thứ tự?", options: ["Đóng DTĐ các phía MBA trước rồi mới cắt áp-tô-mát các máy biến điện áp của MBA.", "Cắt áp-tô-mát các máy biến điện áp của MBA trước rồi đóng DTĐ các phía MBA sau.", "Không quy định cụ thể.", "Tất cả đều sai."], correct: 0 },
+            { id: 40, q: "Lệnh thao tác được coi là thực hiện xong khi:", options: ["Người nhận lệnh đã thực hiện xong đầy đủ các hạng mục thao tác.", "Người nhận lệnh đã ghi đầy đủ các hạng mục và khóa phiếu thao tác.", "Người nhận lệnh báo cáo cho người ra lệnh biết kết quả đã hoàn thành.", "Người nhận lệnh kết thúc thao tác trong ca của mình."], correct: 2 },
+            { id: 41, q: "Phương án nào quy định đúng về việc viết và duyệt phiếu thao tác theo kế hoạch tại nhà máy điện:", options: ["Người viết phiếu là nhân viên vận hành, người duyệt phiếu là Giám đốc, Phó giám đốc nhà máy; Quản đốc, Phó quản đốc phân xưởng vận hành.", "Người viết phiếu là nhân viên vận hành, người duyệt phiếu là Giám đốc, Phó giám đốc nhà máy; Quản đốc, Phó quản đốc phân xưởng vận hành nhà máy điện hoặc người được ủy quyền.", "Người viết phiếu là nhân viên vận hành hoặc nhân viên được giao nhiệm vụ viết phiếu thao tác, người duyệt phiếu là Giám đốc, Phó giám đốc nhà máy; Quản đốc, Phó quản đốc phân xưởng vận hành nhà máy điện hoặc người được ủy quyền.", "Người viết phiếu là nhân viên vận hành hoặc nhân viên được giao nhiệm vụ viết phiếu thao tác, người duyệt phiếu là Giám đốc, Phó giám đốc nhà máy; Quản đốc, Phó quản đốc phân xưởng vận hành."], correct: 2 },
+            { id: 42, q: "Tần số hệ thống điện Quốc gia Việt Nam cho phép dao động khi hệ thống điện vận hành bình thường là bao nhiêu?", options: ["Dải tần số cho phép là 49,5Hz đến 50,5Hz.", "Dải tần số cho phép là 49,6Hz đến 50,4Hz.", "Dải tần số cho phép là 49,7Hz đến 50,3Hz.", "Dải tần số cho phép là 49,8Hz đến 50,2Hz."], correct: 3 },
+            { id: 43, q: "Cấp điện áp 220 kV là?", options: ["Trung áp", "Cao áp", "Siêu cao áp", "Không quy định."], correct: 1 },
+            { id: 44, q: "Logic chạy dừng máy nén khí hạ áp tự động của NMTĐ Đồng Nai 5:", options: ["Khi áp lực Relay báo 0.70MPa sẽ khởi động máy nén khí chính; 0.65MPa khởi động máy dự phòng; 0.75MPa dừng cả hai.", "Khi áp lực Relay báo 0.70MPa sẽ khởi động máy nén khí chính; 0.60MPa khởi động máy dự phòng; 0.75MPa dừng cả hai.", "Khi áp lực Relay báo 0.65MPa sẽ khởi động máy nén khí chính; 0.60MPa khởi động máy dự phòng; 0.70MPa dừng cả hai.", "Khi áp lực Relay báo 0.63MPa sẽ khởi động máy nén khí chính; 0.60MPa khởi động máy dự phòng; 0.70MPa dừng cả hai."], correct: 1 },
+            { id: 45, q: "Áp lực tác động van an toàn của máy nén khí cao áp của NMTĐ Đồng Nai 5:", options: ["7.8MPa", "7.9MPa", "7.5MPa", "8.1MPa"], correct: 2 },
+            { id: 46, q: "Áp lực tác động van an toàn của máy nén khí hạ áp của NMTĐ Đồng Nai 5:", options: ["0.85MPa", "0.86MPa", "0.90MPa", "Tất cả đều sai"], correct: 0 },
+            { id: 47, q: "Hệ thống điều tốc có những nhiệm vụ nào:", options: ["Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh tần số hệ thống điện.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất vô công, điều chỉnh tần số hệ thống điện.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh điện áp đầu cực máy phát.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh công suất vô công."], correct: 0 },
+            { id: 48, q: "Nhiệm vụ điều chỉnh công suất hữu công và giữ ổn định công suất hữu công khi tổ máy đang phát điện thuộc chế độ điều khiển nào:", options: ["Speed mode.", "Power mode.", "Opening mode.", "Condenser mode."], correct: 1 },
+            { id: 49, q: "Phương pháp chỉnh lưu của hệ thống kích từ:", options: ["Cầu chỉnh lưu 3 pha", "Chỉnh lưu 3 pha có điều khiển", "Chỉnh lưu điôt", "Cầu chỉnh lưu 3 pha có điều khiển"], correct: 3 },
+            { id: 50, q: "Bảo vệ phần cơ MBT chính Đồng Nai 5 gồm các chức năng:", options: ["Chức năng 26O, 26W, 63, 96, 71", "Chức năng 26O, 26W, 63, 96, 81", "Chức năng 26O, 26W, 63, 96, 21", "Chức năng 26O, 24W, 63, 96, 71"], correct: 0 },
+            { id: 51, q: "Tác dụng của khí SF6 trong buồng cắt máy cắt?", options: ["Dập hồ quang, tản nhiệt, giảm chấn động.", "Dập hồ quang, cách điện, giảm chấn động.", "Dập hồ quang, cách điện.", "Dập hồ quang, giảm chấn động."], correct: 2 },
+            { id: 52, q: "Tại một thời điểm, Người chỉ huy trực tiếp đội công tác:", options: ["Đồng thời được làm nhiệm vụ Người chỉ huy trực tiếp 2 phiếu công tác cho 2 công việc tiến hành cùng một lúc.", "Đồng thời được làm nhiệm vụ Người chỉ huy trực tiếp 3 phiếu công tác cho 3 công việc tiến hành cùng một lúc.", "Chỉ được làm nhiệm vụ Người chỉ huy trực tiếp 1 phiếu công tác.", "Tất cả các đáp án trên đều sai."], correct: 2 },
+            { id: 53, q: "Quy định về giám sát an toàn trong thời gian làm việc:", options: ["Giám sát an toàn điện và an toàn trong khi làm việc đối với tất cả nhân viên đơn vị công tác thuộc trách nhiệm của Người giám sát an toàn điện.", "Tuỳ theo nhiệm vụ công việc, điều kiện làm việc người chỉ huy trực tiếp được phép đồng thời vừa làm việc, vừa giám sát an toàn, nhưng phải thực hiện việc giám sát an toàn là chính.", "Người sử dụng lao động, cán bộ an toàn của đơn vị làm công việc không cần kiểm tra việc thực hiện giám sát đảm bảo an toàn trong khi làm việc.", "Nếu để xảy ra mất an toàn do lỗi không thực hiện giám sát nhân viên đơn vị công tác trong khi tiến hành công việc thì Người lãnh đạo công việc phải chịu hoàn toàn trách nhiệm trước pháp luật."], correct: 1 },
+            { id: 54, q: "Khi cấp phiếu công tác cho đội công tác:", options: ["Người cấp phiếu có thể ủy quyền cho người khác ghi ở các mục trong phiếu và chỉ việc ký tên và giao phiếu cho đội công tác.", "Người cấp phiếu phải tự ghi đầy đủ các mục trong phiếu theo quy định, ký tên và giao phiếu cho người cho phép.", "Người cấp phiếu giao người lãnh đạo công việc ghi và cấp phiếu cho đội công tác.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 55, q: "Những công việc nào khi làm việc được phép làm theo lệnh công tác:", options: ["Xử lý sự cố thiết bị do nhân viên vận hành thực hiện trong ca trực.", "Những người khác thực hiện dưới sự giám sát của nhân viên vận hành.", "Làm việc ở xa nơi có điện.", "Tất cả các đáp án trên đều đúng."], correct: 3 },
+            { id: 56, q: "Trước khi cho đơn vị công tác vào làm việc ai chịu trách nhiệm giải thích về nội dung, trình tự thực hiện và các biện pháp an toàn?", options: ["Người chỉ huy trực tiếp.", "Người cấp phiếu.", "Người lãnh đạo công việc.", "Người cho phép."], correct: 3 },
+            { id: 57, q: "Việc trao trả nơi làm việc, khóa phiếu và đóng điện phải thực hiện như thế nào là đúng quy định:", options: ["Bàn giao trao trả nơi làm việc, khóa phiếu phải được tiến hành trực tiếp giữa đơn vị công tác và đơn vị quản lý vận hành thiết bị.", "Người chỉ huy trực tiếp ký vào Mục 5.1 kết thúc công tác.", "Người cho phép sau khi kiểm tra lại tại nơi làm việc không còn tiếp đất di động đảm bảo an toàn mới được ký khóa phiếu vào Mục 5.2 và báo cáo Trưởng ca.", "Cả a, b và c."], correct: 3 },
+            { id: 58, q: "Khi máy cắt đang vận hành bình thường thì:", options: ["Có thể làm việc nếu có Phiếu công tác và giám sát an toàn đầy đủ.", "Có thể lau chùi sứ cách điện bằng chổi lông gắn trên sứ cách điện.", "Cấm sửa chữa ở các máy cắt đang vận hành (kể cả việc lau sứ cách điện bằng thiết bị chuyên dùng).", "Cả hai nội dung a và b đều đúng."], correct: 2 },
+            { id: 59, q: "Trong điều kiện vận hành bình thường người giám sát thao tác và người thao tác phải thực hiện những quy định nào?", options: ["Khi nhận phiếu thao tác phải đọc kỹ và kiểm tra lại nội dung thao tác theo sơ đồ, nếu chưa rõ thì phải hỏi lại người ra lệnh.", "Nếu nhận lệnh bằng điện thoại thì người giám sát thao tác phải ghi đầy đủ lệnh đó và nhắc lại từng động tác trong điện thoại, ghi âm lại, ghi sổ nhật ký vận hành.", "Người giám sát thao tác và người thao tác, sau khi xem xét không còn thắc mắc cùng ký vào phiếu, mang phiếu đến địa điểm thao tác.", "Phải bao gồm cả a, b và c."], correct: 3 },
+            { id: 60, q: "Bảo vệ 32 hiện nay:", options: ["Bảo vệ chỉ hoạt động trong chế độ máy phát, ở chế độ chạy bù bảo vệ sẽ bị khóa.", "Bảo vệ hoạt động trong chế độ máy phát và chế độ bù.", "Bảo vệ hoạt động trong chế độ bù.", "Bảo vệ bị khóa trong chế độ máy phát và chế độ bù."], correct: 0 },
+            { id: 61, q: "Trong trạm 220kV quản lý vận hành, bảo vệ 50BF của MC 27X tác động sẽ:", options: ["Gửi đồng thời lệnh cắt máy cắt 27X và cắt các máy cắt trong nội bộ TBA nối trực tiếp với máy cắt 27X.", "Gửi lệnh cắt đi cắt lại máy cắt 27X; nếu vẫn không cắt được thì sau khoảng thời gian cài đặt sẽ gửi lệnh cắt các máy cắt 27X liên quan.", "Gửi lệnh cắt các máy cắt trong nội bộ TBA nối trực tiếp với máy cắt 27X.", "Gửi lệnh cắt các máy cắt trong hệ thống điện nối trực tiếp với máy cắt 27X."], correct: 1 },
+            { id: 62, q: "Theo Quy định lịch kiểm tra – vệ sinh thiết bị thì trách nhiệm nhắc nhở các đơn vị công tác giữ vệ sinh thuộc về:", options: ["Trưởng ca đương phiên có trách nhiệm nhắc nhở các đơn vị công tác trong nhà máy dọn dẹp vệ sinh sau mỗi buổi công tác, nếu để đơn vị công tác làm mất vệ sinh thì trách nhiệm thuộc về trưởng ca đương phiên.", "Ca đương phiên có trách nhiệm nhắc nhở các đơn vị công tác trong nhà máy dọn dẹp vệ sinh sau mỗi buổi công tác, nếu để đơn vị công tác làm mất vệ sinh thì trách nhiệm thuộc về ca đương phiên.", "ATVSV ca đương phiên có trách nhiệm nhắc nhở các đơn vị công tác trong nhà máy dọn dẹp vệ sinh sau mỗi buổi công tác.", "ATVSV nhóm công tác có trách nhiệm nhắc nhở các đơn vị công tác trong nhà máy dọn dẹp vệ sinh."], correct: 1 },
+            { id: 63, q: "Định nghĩa nào sau đây là chính xác?", options: ["Máy biến thế là thiết bị biến đổi một hiệu điện thế của dòng điện này thành một hiệu điện thế của dòng điện khác.", "Máy biến thế là thiết bị thay đổi hiệu điện thế của dòng điện xoay chiều.", "Máy biến thế là thiết bị thay đổi hiệu điện thế của dòng điện nhưng không làm thay đổi tần số.", "Máy biến thế là một thiết bị thay đổi hiệu điện thế của dòng điện xoay chiều nhưng không làm thay đổi tần số."], correct: 3 },
+            { id: 64, q: "Ổ hướng Tua-bin Nhà máy Đồng Nai 5 có bao nhiêu RTD đo nhiệt độ Pad và dầu:", options: ["08 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu.", "07 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu.", "08 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu.", "07 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu."], correct: 2 },
+            { id: 65, q: "Máy biến áp: là thiết bị hoạt động dựa trên hiện tượng cảm ứng điện từ, dùng để biến đổi điện áp xoay chiều mà không làm thay đổi tần số của nó.", options: ["Đúng", "Sai"], correct: 0 },
+            { id: 66, q: "Dao cách ly được đóng mở bằng các chế độ nào?", options: ["Đóng mở bằng tay tại chỗ.", "Đóng mở bằng điện tại tủ điều khiển tại chỗ.", "Đóng mở từ xa tại phòng khiển trung tâm.", "Cả 3 đáp án trên đều đúng."], correct: 3 },
+            { id: 67, q: "Những công việc nào khi làm việc cần phải có phiếu công tác:", options: ["Làm việc gần các thiết bị đang mang điện cao áp với khoảng cách cho phép.", "Những công việc làm ở xa thiết bị có điện.", "Sửa chữa và tháo, lắp đường cáp ngầm cao áp, đường dây nổi hoặc đấu chuyển từ các nhánh dây mới xây dựng vào đường dây trục của lưới.", "Đáp án A và C đúng."], correct: 3 },
+            { id: 68, q: "Tại một thời điểm, Người chỉ huy trực tiếp đội công tác:", options: ["Đồng thời được làm nhiệm vụ Người chỉ huy trực tiếp 2 phiếu công tác cho 2 công việc tiến hành cùng một lúc.", "Đồng thời được làm nhiệm vụ Người chỉ huy trực tiếp 3 phiếu công tác cho 3 công việc tiến hành cùng một lúc.", "Chỉ được làm nhiệm vụ Người chỉ huy trực tiếp 1 phiếu công tác.", "Tất cả các đáp án trên đều sai."], correct: 2 },
+            { id: 69, q: "Sau khi kết thúc công việc và khóa phiếu, người chỉ huy trực tiếp:", options: ["Mang phiếu công tác của mình về lưu giữ.", "Trả lại phiếu công tác cho người cấp phiếu để kiểm tra hoàn thành phiếu.", "Giao lại phiếu cho Phòng Kỹ thuật lưu giữ.", "Tất cả các đáp án trên đều sai."], correct: 3 },
+            { id: 70, q: "Người chỉ huy trực tiếp phải:", options: ["Chỉ cần có mặt khi bàn giao nơi làm việc đã được cô lập hoàn toàn.", "Ủy quyền cho người cho phép giám sát nơi làm việc.", "Không cần có mặt liên tục, chỉ cần giám sát những công việc quan trọng để nhân viên đơn vị công tác không gây sự cố, tai nạn.", "Có mặt liên tục tại nơi làm việc, giám sát và có biện pháp để nhân viên đơn vị công tác không thực hiện những hành vi có thể gây tai nạn."], correct: 3 },
+            { id: 71, q: "Khi cấp phiếu công tác cho đội công tác:", options: ["Người cấp phiếu có thể ủy quyền cho người khác ghi ở các mục trong phiếu và chỉ việc ký tên và giao phiếu cho đội công tác.", "Người cấp phiếu phải tự ghi đầy đủ các mục trong phiếu theo quy định, ký tên và giao phiếu cho người cho phép.", "Người cấp phiếu giao người lãnh đạo công việc ghi và cấp phiếu cho đội công tác.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 72, q: "Ngày đầu tiên đến làm việc theo phiếu công tác, Nhân viên đội công tác phải:", options: ["Tự mình ký vào phiếu công tác.", "Ủy quyền cho Người chỉ huy trực tiếp ký.", "Ủy quyền cho Người đăng ký công tác ký.", "Nhờ người khác ký thay."], correct: 0 },
+            { id: 73, q: "Bắt đầu công việc ngày tiếp theo (phiếu công tác nhiều ngày) thủ tục phải thực hiện:", options: ["Người CHTT đưa đội công tác ra nơi làm việc.", "Người cho phép và Người CHTT phải kiểm tra lại các biện pháp an toàn và ký vào phiếu cho phép đội công tác vào làm việc.", "Người CHTT cùng người cho phép tiến hành thủ tục bắt đầu ngày tiếp theo, còn nhân viên đội công tác ra nơi làm việc trước.", "Tất cả các đáp án nêu trên đều sai."], correct: 1 },
+            { id: 74, q: "Kiểm tra thiết bị không còn điện để bàn giao nơi làm việc cho đội công tác vào làm việc. Người cho phép có thể căn cứ:", options: ["Sơ đồ nối điện để bàn giao.", "Đèn tín hiệu, rơ le, đồng hồ để bàn giao.", "Dùng sào thao tác gõ nhẹ vào thiết bị điện.", "Các hình thức trên chưa đủ điều kiện để bàn giao."], correct: 3 },
+            { id: 75, q: "Khi đặt và tháo tiếp đất di động trên thiết bị điện, cho phép:", options: ["Một người có trình độ an toàn điện bậc 3 thực hiện.", "Một người có trình độ an toàn điện bậc 4 thực hiện.", "Một người có trình độ an toàn điện bậc 4 và một người an toàn điện bậc 3 thực hiện.", "Một người có trình độ an toàn điện bậc 4 và một người bậc 2 thực hiện."], correct: 2 },
+            { id: 76, q: "Phiếu thao tác thực hiện xong:", options: ["Phiếu thao tác thực hiện xong phải được lưu ít nhất 01 tháng.", "Phiếu thao tác thực hiện xong phải được lưu ít nhất 03 tháng.", "Trường hợp thao tác có liên quan đến sự cố, tai nạn thì các phiếu thao tác có liên quan phải được lưu trong hồ sơ điều tra sự cố, tai nạn lao động của đơn vị.", "Cả b và c."], correct: 3 },
+            { id: 77, q: "Khi kiểm tra không còn điện thì phải thực hiện như thế nào cho đúng quy trình an toàn điện:", options: ["Người thực hiện thao tác cắt điện đồng thời phải tiến hành kiểm tra không còn điện ở các thiết bị đã cắt điện.", "Kiểm tra không còn điện bằng thiết bị thử điện chuyên dùng phù hợp với điện áp danh định của thiết bị điện cần thử; phải thử ở tất cả các pha và các phía vào, ra.", "Có thể căn cứ tín hiệu đèn, rơ le, đồng hồ để xác nhận thiết bị điện không còn điện.", "Cả a và b."], correct: 3 },
+            { id: 78, q: "Theo quy trình an toàn điện, phiếu công tác được quy định như thế nào là đúng:", options: ["Là giấy giao nhiệm vụ làm việc ở thiết bị điện.", "Là giấy cho phép đơn vị công tác làm việc với thiết bị điện và phòng ngừa để không xảy ra tai nạn điện.", "Là giấy ghi những biện pháp đảm bảo an toàn khi làm việc ở thiết bị điện.", "Cả a, b và c."], correct: 3 },
+            { id: 79, q: "Cấp chính xác 5P20 có ý nghĩa là gì?", options: ["Khi dòng điện bên sơ cấp tăng gấp 20 lần dòng điện định mức thì sai số tối đa là 5%.", "Khi dòng điện bên sơ cấp tăng gấp 20 lần dòng điện định mức thì sai số lớn hơn 5%.", "Khi dòng điện bên sơ cấp tăng gấp 5 lần dòng điện định mức thì sai số tối đa là 20%.", "Khi dòng điện bên sơ cấp tăng gấp 5 lần dòng điện định mức thì sai số lớn hơn 20%."], correct: 0 },
+            { id: 80, q: "Sau khi cô lập thiết bị và thực hiện xong các biện pháp an toàn, Người cho phép có trách nhiệm khi cho phép vào làm việc:", options: ["Phải chỉ rõ cho Người chỉ huy trực tiếp biết chỗ nào đã được cắt điện, chỗ nào còn điện và các biện pháp đặc biệt cần phải chú ý.", "Người cho phép không cần giải thích gì thêm khi cho phép vào làm việc.", "Phải chỉ rõ cho toàn đội công tác biết chỗ nào đã được cắt điện, chỗ nào còn điện và các biện pháp đặc biệt cần phải chú ý.", "Tất cả phương án trên."], correct: 2 },
+            { id: 81, q: "Khi được phân công làm nhiệm vụ giám sát an toàn điện đội công tác, người giám sát:", options: ["Có thể ủy quyền cho công nhân bậc cao trong đội công tác thực hiện nhiệm vụ giám sát thay.", "Phải luôn luôn có mặt tại nơi đội công tác làm việc.", "Có thể vắng mặt trong thời gian ngắn.", "Không phải thực hiện giám sát."], correct: 1 },
+            { id: 82, q: "Khi thao tác sai hoặc gây ra sự cố, đơn vị thao tác phải:", options: ["Ngừng ngay phiếu thao tác và báo cáo cho người ra lệnh biết. Việc thực hiện thao tác tiếp theo phải được tiến hành theo một phiếu mới.", "Ngừng ngay phiếu thao tác và hội ý để tiếp tục thao tác khắc phục lại thao tác sai sau đó báo cáo cho người ra lệnh biết.", "Báo cáo cấp trên trước khi thao tác khắc phục sai sót.", "Ghi bổ sung vào phiếu thao tác và báo cáo cấp trên."], correct: 0 },
+            { id: 83, q: "Đối với thiết bị ngoài trời trong lúc mưa to nước chảy thành dòng trên thiết bị, dụng cụ an toàn hoặc đang có giông sét thì:", options: ["Cấm đóng, cắt điện bằng sào thao tác và dao cách ly thao tác trực tiếp tại chỗ hoặc thay dây chì.", "Được phép đóng, cắt dao cách ly ở những đường dây không có điện.", "Cho phép đóng, cắt điện bằng sào thao tác và dao cách ly thao tác trực tiếp tại chỗ nếu mang đầy đủ găng tay cách điện và ủng cách điện.", "A và B đều đúng"], correct: 3 },
+            { id: 84, q: "Bắt đầu công việc ngày tiếp theo (phiếu công tác nhiều ngày) thủ tục phải thực hiện:", options: ["Người CHTT đưa đội công tác ra nơi làm việc.", "Người cho phép và Người CHTT phải kiểm tra lại các biện pháp an toàn và ký vào phiếu cho phép đội công tác vào làm việc.", "Người CHTT cùng người cho phép tiến hành thủ tục bắt đầu ngày tiếp theo, còn nhân viên đội công tác ra nơi làm việc trước.", "Tất cả các đáp án nêu trên đều sai."], correct: 1 },
+            { id: 85, q: "Khi đặt và tháo tiếp đất di động trên thiết bị điện, cho phép:", options: ["Một người có trình độ an toàn điện bậc 3 thực hiện.", "Một người có trình độ an toàn điện bậc 4 thực hiện.", "Một người có trình độ an toàn điện bậc 4 và một người an toàn điện bậc 3 thực hiện.", "Một người có trình độ an toàn điện bậc 4 và một người bậc 2 thực hiện."], correct: 2 },
+            { id: 86, q: "Phiếu thao tác thực hiện xong:", options: ["Phiếu thao tác thực hiện xong phải được lưu ít nhất 01 tháng.", "Phiếu thao tác thực hiện xong phải được lưu ít nhất 03 tháng.", "Trường hợp thao tác có liên quan đến sự cố, tai nạn thì các phiếu thao tác có liên quan phải được lưu trong hồ sơ điều tra sự cố, tai nạn lao động của đơn vị.", "Cả b và c."], correct: 3 },
+            { id: 87, q: "Khi gặp sự cố có thể gây nguy hiểm cho người hoặc hư hại thiết bị. Nhân viên vận hành được phép:", options: ["Cắt điện ngay.", "Báo cho người phụ trách để xử lý.", "Cắt điện ngay sau đó phải báo cho nhân viên vận hành cấp trên và người phụ trách trực tiếp của mình biết nội dung những việc đã làm, sau đó ghi đầy đủ vào nhật ký vận hành.", "Chỉ được cắt điện khi có lệnh hoặc Phiếu theo quy trình."], correct: 2 },
+            { id: 88, q: "Được phép tiến hành đặt tiếp đất lưu động:", options: ["Sau khi cắt điện.", "Sau khi kiểm tra không còn điện.", "Nếu có giám sát an toàn.", "Nếu có hai người thực hiện."], correct: 1 },
+            { id: 89, q: "Trong quá trình thực hiện công việc, nếu thấy có việc phát sinh cần xử lý ở ngoài phạm vi được phép làm việc của phiếu công tác thì giải quyết như thế nào?", options: ["Phải cấp phiếu công tác mới cho công việc đó.", "Người chỉ huy trực tiếp tổ chức biện pháp an toàn để thực hiện, ghi thêm vào phiếu đang làm.", "Người chỉ huy trực tiếp báo cho người cho phép biết và tổ chức biện pháp an toàn để thực hiện, đồng thời ghi thêm vào phiếu đang công tác.", "Cả a và c."], correct: 0 },
+            { id: 90, q: "Khi cấp phiếu công tác phải thực hiện theo những quy định nào sau đây:", options: ["Theo đúng mẫu, nội dung ghi dễ hiểu, đủ và đúng theo yêu cầu công việc; cấm tẩy xóa, viết bằng bút chì, rách nát, nhòe chữ.", "Lập thành 02 bản, do người cấp phiếu trực tiếp ký và giao cho người cho phép mang đến hiện trường để làm thủ tục cho phép làm việc.", "Trường hợp người cho phép kiêm người chỉ huy trực tiếp thì được phép lập, sử dụng 01 bản.", "Cả a, b và c."], correct: 3 },
+            { id: 91, q: "Tủ điều khiển bơm tiêu thấm, bơm tháo cạn, các bơm và van điện có:", options: ["2 chế độ vận hành: Tự động và bằng tay", "1 Chế độ vận hành: Tự động", "1 Chế độ vận hành: Bằng tay", "Cả 3 đáp án trên đều sai"], correct: 0 },
+            { id: 92, q: "Những công việc nào khi làm việc cần phải có phiếu công tác:", options: ["Làm việc gần các thiết bị đang mang điện cao áp với khoảng cách cho phép.", "Những công việc làm ở xa thiết bị có điện.", "Sửa chữa và tháo, lắp đường cáp ngầm cao áp, đường dây nổi hoặc đấu chuyển từ các nhánh dây mới xây dựng vào đường dây trục của lưới.", "Đáp án A và C đúng."], correct: 3 },
+            { id: 93, q: "Khi kết thúc toàn bộ công việc khóa phiếu đóng điện nhưng phát hiện khiếm khuyết phức tạp, thời gian xử lý dài cần xử lý phải:", options: ["Cấp lại phiếu công tác khác để thực hiện công việc.", "Làm thủ tục trên phiếu công tác đã khóa và cho phép đội công tác vào xử lý.", "Thực hiện xử lý theo lệnh công tác.", "Không cần ghi vào phiếu công tác, yêu cầu đội công tác tiến hành sửa chữa ngay các thiếu sót."], correct: 0 },
+            { id: 94, q: "Quy định về giám sát an toàn trong thời gian làm việc:", options: ["Giám sát an toàn điện và an toàn trong khi làm việc đối với tất cả nhân viên đơn vị công tác thuộc trách nhiệm của Người giám sát an toàn điện.", "Tuỳ theo nhiệm vụ công việc, điều kiện làm việc người chỉ huy trực tiếp được phép đồng thời vừa làm việc, vừa giám sát an toàn, nhưng phải thực hiện việc giám sát an toàn là chính.", "Người sử dụng lao động, cán bộ an toàn của đơn vị làm công việc không cần kiểm tra việc thực hiện giám sát đảm bảo an toàn trong khi làm việc.", "Nếu để xảy ra mất an toàn do lỗi không thực hiện giám sát nhân viên đơn vị công tác thì Người lãnh đạo công việc phải chịu trách nhiệm."], correct: 1 },
+            { id: 95, q: "Người chỉ huy trực tiếp phải:", options: ["Chỉ cần có mặt khi bàn giao nơi làm việc đã được cô lập hoàn toàn.", "Ủy quyền cho người cho phép giám sát nơi làm việc.", "Không cần có mặt liên tục, chỉ cần giám sát những công việc quan trọng để nhân viên đơn vị công tác không gây sự cố, tai nạn.", "Có mặt liên tục tại nơi làm việc, giám sát và có biện pháp để nhân viên đơn vị công tác không thực hiện những hành vi có thể gây tai nạn."], correct: 3 },
+            { id: 96, q: "Khi cấp phiếu công tác cho đội công tác:", options: ["Người cấp phiếu có thể ủy quyền cho người khác ghi ở các mục trong phiếu và chỉ việc ký tên và giao phiếu cho đội công tác.", "Người cấp phiếu phải tự ghi đầy đủ các mục trong phiếu theo quy định, ký tên và giao phiếu cho người cho phép.", "Người cấp phiếu giao người lãnh đạo công việc ghi và cấp phiếu cho đội công tác.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 97, q: "Lệnh thao tác phải:", options: ["Thể hiện rõ mục đích, ý nghĩa và yêu cầu của các thao tác.", "Ngắn gọn, rõ ràng, chính xác, chỉ rõ mục đích thao tác và trình tự tiến hành thao tác.", "Đủ điều kiện thì người nhận lệnh mới tiến hành các thao tác theo yêu cầu của người ra lệnh.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 98, q: "Trước khi cho đơn vị công tác vào làm việc ai chịu trách nhiệm giải thích về nội dung, trình tự thực hiện và các biện pháp an toàn?", options: ["Người chỉ huy trực tiếp.", "Người cấp phiếu.", "Người lãnh đạo công việc.", "Người cho phép."], correct: 3 },
+            { id: 99, q: "Ổ hướng đỡ Nhà máy Đồng Nai 5 có bao nhiêu RTD đo nhiệt độ Pad và dầu:", options: ["12 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu.", "12 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu.", "08 RTD đo nhiệt độ Pad và 02 RTD đo nhiệt độ dầu.", "08 RTD đo nhiệt độ Pad và 01 RTD đo nhiệt độ dầu."], correct: 1 },
+            { id: 100, q: "Tủ điều khiển LCU nào có chức năng điều khiển, giám sát hệ thống Khí nén cao áp và hạ áp?", options: ["LCU1.", "LCU2.", "LCU3.", "LCU4."], correct: 3 },
+            { id: 101, q: "Luật PCCC quy định khi có cháy yêu cầu nào được ưu tiên sử dụng cho chữa cháy?", options: ["Mọi nguồn nước chữa cháy.", "Mọi nguồn nước và các vật liệu chữa cháy.", "Các vật liệu chữa cháy phải được ưu tiên sử dụng cho chữa cháy.", "Mọi nguồn nước và các vật dụng khác."], correct: 1 },
+            { id: 102, q: "Bảo vệ không đồng pha tác động thì:", options: ["Chỉ khi cả ba pha của máy cắt đóng không đồng thời với thời gian lớn hơn thời gian cài đặt.", "Chỉ khi cả ba pha của máy cắt cắt không đồng thời với thời gian lớn hơn thời gian cài đặt.", "Chỉ cần 1 pha của máy cắt cắt hoặc đóng không đồng thời với 2 pha còn lại lớn hơn thời gian cài đặt.", "Khi cả Ba pha của máy cắt cắt hoặc đóng không đồng thời với thời gian lớn hơn thời gian cài đặt."], correct: 2 },
+            { id: 103, q: "Trình tự làm việc của tổ máy khi chức năng 59 (bảo vệ quá áp máy phát) tác động:", options: ["Trip máy cắt đầu cực", "Trip máy cắt đầu cực và máy cắt kích từ", "Trip máy cắt đầu cực, máy cắt kích từ và dừng máy", "Không phải các đáp án trên"], correct: 2 },
+            { id: 104, q: "Chức năng bảo vệ kém áp tác động khi giá trị điện áp đầu cực máy phát Utd đạt giá trị nào sau đây:", options: ["Utd < 70% Uđm", "Utd <= 80% Uđm", "20% Uđm < Utd < 80% Uđm", "Utd < 90% Uđm"], correct: 0 },
+            { id: 105, q: "Các chức năng giám sát của hệ thống kích từ:", options: ["Giám sát sự cố chạm đất rotor, Giám sát nhiệt độ rotor, Giám sát quá dòng điện rotor, Giám sát quá điện áp Stator, Giám sát V/hz", "Giám sát sự cố chạm đất rotor, Giám sát nhiệt độ rotor, Giám sát quá dòng điện rotor, Giám sát P/Q limit Giám sát V/hz.", "Giám sát sự cố chạm đất rotor, Giám sát quá dòng điện rotor, Giám sát quá điện áp Stator, Giám sát P/Q limit Giám sát V/hz.", "Giám sát sự cố chạm đất rotor, Giám sát nhiệt độ rotor, Giám sát quá dòng điện rotor, Giám sát quá điện áp Stator, Giám sát P/Q limit Giám sát V/hz"], correct: 3 },
+            { id: 106, q: "Phải kiểm tra trạng thái tại chỗ dao cách ly khi nào?", options: ["Ngay sau khi kết thúc thao tác.", "Trước khi thao tác dao tiếp địa.", "Trước khi thao tác máy cắt.", "Sau khi thực hiện thao tác xa."], correct: 1 },
+            { id: 107, q: "Trước khi đưa thiết bị hoặc đường dây vào vận hành sau sửa chữa thì nhân viên vận hành cần lưu ý điều kiện gì?", options: ["Đơn vị quản lý vận hành phải khẳng định người và phương tiện đã rút hết.", "Đơn vị quản lý vận hành phải khẳng định các tiếp địa di động đã tháo hết.", "Đơn vị quản lý vận hành phải khẳng định chắc chắn các đơn vị công tác (người và phương tiện) đã rút hết, đã tháo hết tiếp địa di động, đã khóa tất cả các phiếu công tác; đường dây, thiết bị đủ tiêu chuẩn vận hành và sẵn sàng nhận điện.", "Đơn vị thi công phải khẳng định người và phương tiện đã rút hết."], correct: 2 },
+            { id: 108, q: "Phương án nào quy định đúng trình tự tiến hành thao tác?", options: ["Người giám sát và người thao tác kiểm tra đúng thiết bị cần thao tác; Người giám sát đọc lệnh; Người thao tác nhắc lại lệnh; Người thao tác thực hiện thao tác.", "Người giám sát đọc lệnh; Người thao tác nhắc lại lệnh; Người thao tác thực hiện thao tác; Người giám sát và người thao tác kiểm tra thao tác tốt;", "Người giám sát kiểm tra đúng thiết bị cần thao tác; Người giám sát đọc lệnh; Người thao tác nhắc lại lệnh; Người thao tác thực hiện thao tác;", "Người thao tác kiểm tra đúng thiết bị cần thao tác; Người giám sát đọc lệnh; Người thao tác nhắc lại lệnh; Người thao tác thực hiện thao tác."], correct: 0 },
+            { id: 109, q: "Điện áp hệ thống điện Quốc gia Việt Nam cho phép dao động khi hệ thống điện 220kV vận hành bình thường là bao nhiêu?", options: ["Dải điện áp cho phép là 200 kV đến 240 kV.", "Dải điện áp cho phép là 205 kV đến 235 kV.", "Dải điện áp cho phép là 209 kV đến 242 kV.", "Dải điện áp cho phép là 210 kV đến 245 kV."], correct: 2 },
+            { id: 110, q: "Phương án nào quy định đúng tiêu chuẩn điện áp thanh cái trên lưới điện 220kV ở chế độ sự cố đơn lẻ?", options: ["Từ 209 kV đến 242 kV", "Từ 198 kV đến 242 kV", "Từ 190 kV đến 245 kV", "Từ 195 kV đến 245 kV"], correct: 1 },
+            { id: 111, q: "Logic chạy dừng máy nén khí cao áp tự động của NMTĐ Đồng Nai 5:", options: ["Khi áp lực Relay báo 6.9MPa sẽ khởi động máy nén khí chính; 6.8MPa khởi động máy dự phòng; 7.0MPa dừng cả hai.", "Khi áp lực Relay báo 6.8MPa sẽ khởi động máy nén khí chính; 6.5MPa khởi động máy dự phòng; 7.0MPa dừng cả hai.", "Khi áp lực Relay báo 6.8MPa sẽ khởi động máy nén khí chính; 6.5MPa khởi động máy dự phòng; 6.9MPa dừng cả hai.", "Khi áp lực Relay báo 6.7MPa sẽ khởi động máy nén khí chính; 6.5MPa khởi động máy dự phòng; 6.9MPa dừng cả hai."], correct: 1 },
+            { id: 112, q: "Áp lực khí báo Alarm áp lực thấp máy nén khí cao áp của NMTĐ Đồng Nai 5:", options: ["6.1MPa", "6.2MPa", "6.3MPa", "6.4MPa"], correct: 3 },
+            { id: 113, q: "Chức năng của dầu trong các ổ đỡ, ổ hướng trên, ổ hướng dưới, ổ hướng Turbine của tổ máy NMTĐ Đồng Nai 5:", options: ["Có tác dụng bôi trơn.", "Có tác dụng cách điện.", "Có tác dụng làm mát.", "Tất cả đều đúng."], correct: 3 },
+            { id: 114, q: "Điều kiện nạp khí và dừng nạp khí tự động bình dầu áp lực hệ thống điều tốc của tổ máy Đồng Nai 5:", options: ["Khí sẽ được nạp tự động khi mức dầu lên đến 600 mm và áp lực dầu ≤ 5,85 MPa. Dừng nạp khi mức dầu giảm đến 300mm hoặc áp lực dầu tăng đến 6,3 MPa.", "Khí sẽ được nạp tự động khi mức dầu lên đến 700 mm và áp lực dầu ≤ 5,9 MPa. Dừng nạp khi mức dầu giảm đến 200 mm hoặc áp lực dầu tăng đến 6,3 MPa.", "Khí sẽ được nạp tự động khi mức dầu lên đến 700 mm và áp lực dầu ≤ 5,85 MPa. Dừng nạp khi mức dầu giảm đến 300 mm hoặc áp lực dầu tăng đến 6,3 MPa.", "Khí sẽ được nạp tự động khi mức dầu lên đến 600 mm và áp lực dầu ≤ 5,7 MPa. Dừng nạp khi mức dầu giảm đến 300 mm hoặc áp lực dầu tăng đến 6,3 MPa."], correct: 2 },
+            { id: 115, q: "Hệ thống điều tốc có những nhiệm vụ nào:", options: ["Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh tần số hệ thống điện.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất vô công, điều chỉnh tần số hệ thống điện.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh điện áp đầu cực máy phát.", "Điều chỉnh tốc độ tổ máy, điều chỉnh công suất hữu công, điều chỉnh công suất vô công."], correct: 0 },
+            { id: 116, q: "Nhiệm vụ của hệ thống kích từ:", options: ["Hình thành điện áp ban đầu trong máy phát, tự động điều chỉnh điện áp đầu cực máy phát.", "Hình thành điện áp ban đầu trong máy phát, điều chỉnh công suất phản kháng Q.", "Hình thành điện áp ban đầu trong máy phát, tự động điều chỉnh điện áp đầu cực máy phát, điều chỉnh công suất phản kháng Q.", "Hình thành điện áp ban đầu trong máy phát đồng bộ, tự động điều chỉnh điện áp đầu cực máy phát, điều chỉnh công suất phản kháng Q."], correct: 3 },
+            { id: 117, q: "Những công việc nào khi làm việc cần phải có phiếu công tác:", options: ["Làm việc gần các thiết bị đang mang điện cao áp với khoảng cách cho phép.", "Những công việc làm ở xa thiết bị có điện.", "Sửa chữa và tháo, lắp đường cáp ngầm cao áp, đường dây nổi hoặc đấu chuyển từ các nhánh dây mới xây dựng vào đường dây trục của lưới.", "Đáp án A và C đúng."], correct: 3 },
+            { id: 118, q: "Khi kết thúc toàn bộ công việc khóa phiếu đóng điện nhưng phát hiện khiếm khuyết phức tạp, thời gian xử lý dài cần xử lý phải:", options: ["Cấp lại phiếu công tác khác để thực hiện công việc.", "Làm thủ tục trên phiếu công tác đã khóa và cho phép đội công tác vào xử lý.", "Thực hiện xử lý theo lệnh công tác.", "Không cần ghi vào phiếu công tác, yêu cầu đội công tác tiến hành sửa chữa ngay các thiếu sót."], correct: 0 },
+            { id: 119, q: "Lệnh thao tác phải:", options: ["Thể hiện rõ mục đích, ý nghĩa và yêu cầu của các thao tác.", "Ngắn gọn, rõ ràng, chính xác, chỉ rõ mục đích thao tác và trình tự tiến hành thao tác.", "Đủ điều kiện thì người nhận lệnh mới tiến hành các thao tác theo yêu cầu của người ra lệnh.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 120, q: "Phương án nào quy định đúng cho phép nhà máy điện tạm ngừng thao tác?", options: ["Thời gian thao tác kéo dài liên tục quá 04 giờ.", "Thao tác phải thực hiện ngoài trời trong điều kiện thời tiết xấu.", "Đang thao tác thì xảy ra sự cố hoặc có cảnh báo hiện tượng bất thường.", "Phương án a, b, c."], correct: 3 },
+            { id: 121, q: "Cắt điện để làm công việc phải thực hiện như thế nào cho đúng quy trình an toàn điện:", options: ["Phần thiết bị tiến hành công việc phải được nhìn thấy rõ đã cách ly khỏi các phần có điện từ mọi phía bằng cách cắt dao cách ly, tháo cầu chì, tháo đầu cáp, tháo dây dẫn (trừ trạm GIS).", "Cấm cắt điện để làm việc chỉ bằng máy cắt, dao phụ tải và dao cách ly có bộ truyền động tự động.", "Phải ngăn chặn được những nguồn điện cao, hạ áp qua các máy biến áp lực, máy biến áp đo lường, máy phát điện khác có điện ngược trở lại gây nguy hiểm cho người làm việc.", "Thực hiện theo cả a, b và c."], correct: 3 },
+            { id: 122, q: "Chức năng 87T bảo vệ MBT chính khi tác động sẽ:", options: ["Cắt hai máy cắt phía cao áp MBT chính, máy cắt đầu cực, máy cắt kích từ và dừng máy phát", "Cắt hai máy cắt phía cao áp MBT chính, máy cắt đầu cực, khởi động chức năng 50BF và dừng máy phát", "Cắt máy cắt đầu cực, máy cắt kích từ, hai máy cắt phía cao áp MBT chính, cắt máy cắt phía hạ áp MBT tự dùng, khởi động chức năng 50BF của các máy cắt phía cao áp MBT chính và dừng máy phát", "Không phải các phương án trên"], correct: 2 },
+            { id: 123, q: "Nhiệm vụ Chức năng V/HZ của hệ thống kích từ:", options: ["Bảo vệ quá nhiệt cuộn dây Stato", "Bảo vệ quá nhiệt cuộn dây RoTo", "Bảo vệ quá tải máy phát", "Bảo vệ quá từ thông máy phát"], correct: 3 },
+            { id: 124, q: "Hãy nêu các nguyên nhân có thể dẫn đến nhiệt độ dầu ổ hướng dưới Máy phát của nhà máy Đồng Nai 5 tăng cao cấp 1:", options: ["Lưu lượng nước làm mát ổ hướng dưới bị thiếu do nghẹt ống dẫn hoặc bị xì do bể ống dẫn nước.", "Các bộ làm mát dầu bị nghẹt hay bẩn làm hiệu suất các bộ làm mát cho ổ hướng dưới bị giảm thấp.", "Cả hai đáp án a và b đều đúng", "Không phải do hai nguyên nhân a và b"], correct: 2 },
+            { id: 125, q: "Trình tự tác động tổ máy khi bị sự cố 49G – bảo vệ quá tải máy phát?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload"], correct: 1 },
+            { id: 126, q: "Khi thao tác mở DCL thì xuất hiện hồ quang, NVVH phải:", options: ["Tiếp tục mở DCL cho hết hành trình.", "Đóng lại DCL.", "Dừng thao tác và chạy nhanh ra xa.", "Báo cáo NVVH cấp trên."], correct: 0 },
+            { id: 127, q: "Phải kiểm tra trạng thái tại chỗ dao cách ly khi nào?", options: ["Ngay sau khi kết thúc thao tác.", "Trước khi thao tác dao tiếp địa.", "Trước khi thao tác máy cắt.", "Sau khi thực hiện thao tác xa."], correct: 1 },
+            { id: 128, q: "Trình tự dừng máy khi có sự cố nặng hệ thống điều tốc:", options: ["Dừng nhanh điều tốc bằng van dừng khẩn cấp Khi Cánh hướng đóng về không tải: cắt Máy cắt đầu cực máy phát 901 (902), cắt Máy cắt kích từ FCB.", "Dừng nhanh điều tốc bằng van dừng khẩn cấp, Khi Cánh hướng đóng về không tải: cắt Máy cắt đầu cực máy phát 901 (902), cắt Máy cắt kích từ FCB, Tổ máy tiếp tục dừng.", "Dừng nhanh điều tốc bằng van dừng khẩn cấp , Khi Cánh hướng đóng về không tải: cắt Máy cắt kích từ FCB , cắt Máy cắt đầu cực máy phát 901 (902), Tổ máy tiếp tục dừng.", "Dừng nhanh điều tốc bằng van dừng khẩn cấp, cắt Máy cắt đầu cực máy phát 901 (902), cắt Máy cắt kích từ FCB, Tổ máy tiếp tục dừng."], correct: 1 },
+            { id: 129, q: "Trường hợp nào vận hành hệ thống kích từ ở chế độ Local:", options: ["Hệ thống kích từ được chọn làm việc ở chế độ “Local” điều khiển tại chỗ khi hệ thống điều khiển từ xa hỏng hoặc cho mục đích thí nghiệm hay sửa chữa.", "Hệ thống kích từ được chọn làm việc ở chế độ “Local” điều khiển tại chỗ khi giải quyết sự cố, hệ điều khiển từ xa hỏng.", "Hệ thống kích từ được chọn làm việc ở chế độ “Local” điều khiển tại chỗ khi giải quyết sự cố, hệ thống điều khiển từ xa hỏng hoặc cho mục đích thí nghiệm hay sửa chữa.", "Hệ thống kích từ được chọn làm việc ở chế độ “Local” điều khiển tại chỗ khi giải quyết sự cố hoặc cho mục đích thí nghiệm hay sửa chữa."], correct: 2 },
+            { id: 130, q: "Lệnh thao tác phải:", options: ["Thể hiện rõ mục đích, ý nghĩa và yêu cầu của các thao tác.", "Ngắn gọn, rõ ràng, chính xác, chỉ rõ mục đích thao tác và trình tự tiến hành thao tác.", "Đủ điều kiện thì người nhận lệnh mới tiến hành các thao tác theo yêu cầu của người ra lệnh.", "Tất cả các đáp án trên đều đúng."], correct: 1 },
+            { id: 131, q: "Trong quá trình thực hiện công việc, nếu thấy có việc phát sinh cần xử lý ở ngoài phạm vi được phép làm việc của phiếu công tác thì giải quyết như thế nào?", options: ["Phải cấp phiếu công tác mới cho công việc đó.", "Người chỉ huy trực tiếp tổ chức biện pháp an toàn để thực hiện, ghi thêm vào phiếu đang làm.", "Người chỉ huy trực tiếp báo cho người cho phép biết và tổ chức biện pháp an toàn để thực hiện, đồng thời ghi thêm vào phiếu đang công tác.", "Cả a và c."], correct: 0 },
+            { id: 132, q: "Trong điều kiện vận hành bình thường người giám sát thao tác và người thao tác phải thực hiện những quy định nào?", options: ["Người giám sát thao tác và người thao tác, sau khi xem xét không còn thắc mắc cùng ký vào phiếu, mang phiếu đến địa điểm thao tác.", "Tới nơi (vị trí) thao tác phải kiểm tra lại một lần nữa theo sơ đồ (nếu có) và đối chiếu vị trí thiết bị trên thực tế đúng với nội dung ghi trong phiếu, đồng thời kiểm tra xung quanh hay trên thiết bị còn gì trở ngại không, sau đó mới được phép thao tác.", "Phải bao gồm cả a và b.", "Cả a, b và c đều sai."], correct: 2 },
+            { id: 133, q: "Chuẩn bị nơi làm việc để đảm bảo an toàn khi tiến hành công việc thì phương pháp làm rào chắn như thế nào là đúng:", options: ["Rào chắn tạm thời để ngăn cách phần thiết bị có điện với nơi làm việc phải làm bằng vật liệu khô và chắc chắn, như tre, gỗ, nhựa, tấm vật liệu cách điện... Khoảng cách từ rào chắn tạm thời đến phần có điện phụ thuộc vào từng cấp điện áp.", "Trường hợp đặc biệt, ở thiết bị điện cấp điện áp đến 15kV, rào chắn tạm thời bằng vật liệu cách điện được chạm vào phần có điện dưới sự giám sát của người có bậc 5 an toàn điện.", "Rào chắn tạm thời phải đặt sao cho khi có nguy hiểm người làm việc dễ dàng thoát ra khỏi vùng nguy hiểm.", "Cả a, b và c đều đúng"], correct: 3 },
+            { id: 134, q: "Trình tự tác động tổ máy khi bị sự cố 46 – bảo vệ dòng thứ tự nghịch?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload"], correct: 1 },
+            { id: 135, q: "Các bảo vệ cơ bản của hệ thống kích từ:", options: ["Chức năng bảo vệ quá áp DC", "Chức năng bảo vệ quá áp AC, bảo vệ chạm đất Rôto", "Chức năng bảo vệ quá Áp DC, quá Áp AC", "Chức năng bảo vệ quá áp DC, quá áp AC và bảo vệ chạm đất Roto"], correct: 3 },
+            { id: 136, q: "Trình tự tác động tổ máy khi bị sự cố 51T – bảo vệ quá dòng máy biến thế chính T1?", options: ["Cắt 901, FCB; Cắt MC 271,273; Dừng sự cố điện.", "Cắt 901; Cắt MC 271,273, QFB1; Dừng sự cố điện.", "Cắt 901; Cắt MC 271,273; Tổ máy về Noload.", "Cắt 901, FCB; Cắt MC 271,273; Tổ máy về Novolt."], correct: 2 },
+            { id: 137, q: "Trình tự làm việc của tổ máy khi chức năng 40 (bảo vệ mất kích từ máy phát tác động):", options: ["Trip máy cắt kích từ", "Trip máy cắt đầu cực và máy cắt kích từ", "Trip máy cắt đầu cực, máy cắt kích từ và dừng máy", "Trip máy cắt đầu cực"], correct: 3 },
+            { id: 138, q: "Nghỉ giải lao trong khi làm việc, nếu cắt điện từng phần hoặc không cắt điện thì:", options: ["Khi nghỉ xong, người chỉ huy trực tiếp, người giám sát an toàn điện (nếu có) cho nhân viên vào làm việc.", "Khi nghỉ xong, người chỉ huy trực tiếp, người giám sát an toàn điện (nếu có) kiểm tra còn đủ và đúng các biện pháp an toàn mới được cho nhân viên vào làm việc.", "Khi nghỉ xong, người cho phép kiểm tra còn đủ và đúng các biện pháp an toàn mới được cho đơn vị công tác vào làm việc.", "Cả a, b và c."], correct: 1 },
+            { id: 139, q: "Khi nghỉ giải lao, việc đóng điện khôi phục thiết bị đang sửa chữa là:", options: ["Tuyệt đối cấm.", "Trong trường hợp đặc biệt đơn vị QLVH có thể đóng điện lại thiết bị này khi biết chắc chắn thiết bị đó vẫn đủ tiêu chuẩn vận hành, không còn người đang làm việc, không gây nguy hiểm và mất an toàn nhưng phải làm các biện pháp: tháo tiếp đất, treo biển báo nguy hiểm, cử người thường trực báo người CHTT không được vào làm việc nữa.", "Trong trường hợp đặc biệt đơn vị QLVH có thể đóng điện lại thiết bị này khi biết chắc chắn thiết bị đó vẫn đủ tiêu chuẩn vận hành, nhưng phải chờ khóa Phiếu công tác.", "Cả a, b và c."], correct: 1 },
+            { id: 140, q: "Khi làm việc lần lượt ở nhiều nơi trên cùng một lộ, một đường dây, đoạn đường dây với 01 phiếu công tác thì phải thực hiện như thế nào là đúng quy định:", options: ["Những nơi sẽ làm việc phải được nhân viên vận hành thực hiện biện pháp kỹ thuật chuẩn bị nơi làm việc, được người cho phép giao và chỉ dẫn cho người chỉ huy trực tiếp từ khi bắt đầu công việc", "Người chỉ huy trực tiếp và toàn đơn vị công tác chỉ được làm việc ở một nơi (vị trí) xác định trong số các nơi nói trên", "Cấm thực hiện “Di chuyển nơi làm việc” mà khi đến nơi làm việc tiếp theo phải thực hiện cắt điện", "Cả a, b và c"], correct: 3 },
+            { id: 141, q: "Khi làm việc lần lượt ở nhiều nơi trên cùng một lộ, một đường dây, đoạn đường dây với 01 phiếu công tác thì phải thực hiện như thế nào là đúng quy định:", options: ["Những nơi sẽ làm việc phải được nhân viên vận hành thực hiện biện pháp kỹ thuật chuẩn bị nơi làm việc, được người cho phép giao và chỉ dẫn cho người giám sát an toàn điện từ khi bắt đầu công việc", "Người chỉ huy trực tiếp và toàn đơn vị công tác chỉ được làm việc ở một nơi (vị trí) xác định trong số các nơi nói trên", "Thực hiện “Di chuyển nơi làm việc” mà khi đến nơi làm việc tiếp theo phải thực hiện cắt điện", "Cả a, b và c"], correct: 1 },
+            { id: 142, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi có nhân viên trực vận hành thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Do người cho phép tiến hành thủ tục cho phép làm việc", "Đồng thời người cho phép và người chỉ huy trực tiếp phải ghi, cùng ký vào mục 5 của phiếu công tác", "Tiến hành theo phiếu công tác mới- nếu khi đến nơi làm việc tiếp theo phải thực hiện cắt điện", "Cả a, b và c"], correct: 3 },
+            { id: 143, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi có nhân viên trực vận hành thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Do người cho phép tiến hành thủ tục cho phép làm việc", "Đồng thời người cho phép và người chỉ huy trực tiếp phải ghi, cùng ký vào mục 5 của phiếu công tác", "Cả a và b", "Tiến hành theo phiếu công tác mới"], correct: 2 },
+            { id: 144, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi không có nhân viên vận hành trực thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành về những nơi (vị trí) sẽ di chuyển trong quá trình làm công việc", "Phải được sự chỉ dẫn chi tiết từ ban đầu của người cho phép", "Trước khi di chuyển người chỉ huy trực tiếp phải thông báo để người cho phép (hoặc Trưởng ca trực vận hành) chấp thuận", "Cả a, b và c"], correct: 3 },
+            { id: 145, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi không có nhân viên vận hành trực thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành về những nơi (vị trí) sẽ di chuyển trong quá trình làm công việc", "Phải được sự chỉ dẫn chi tiết từ ban đầu của người lãnh đạo công việc", "Trước khi di chuyển người chỉ huy trực tiếp phải thông báo để người lãnh đạo công việc (hoặc Trưởng ca trực vận hành) chấp thuận", "Người lãnh đạo công việc chỉ được phân công nhân viên đơn vị công tác vào làm việc tại vị trí làm việc kế tiếp sau khi đã thực hiện đủ, đúng các biện pháp an toàn theo yêu cầu công việc"], correct: 0 },
+            { id: 146, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi không có nhân viên vận hành trực thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Phải được sự chỉ dẫn chi tiết từ ban đầu của người cho phép", "Trước khi di chuyển người chỉ huy trực tiếp phải thông báo để người lãnh đạo công việc (hoặc Trưởng ca trực vận hành) chấp thuận", "Người lãnh đạo công việc chỉ được phân công nhân viên đơn vị công tác vào làm việc tại vị trí làm việc kế tiếp sau khi đã thực hiện đủ, đúng các biện pháp an toàn theo yêu cầu công việc", "Cả a, b và c"], correct: 0 },
+            { id: 147, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi không có nhân viên vận hành trực thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Phải được sự chỉ dẫn chi tiết từ ban đầu của người lãnh đạo công việc", "Trước khi di chuyển người chỉ huy trực tiếp phải thông báo để người lãnh đạo công việc (hoặc Trưởng ca trực vận hành) chấp thuận", "Người chỉ huy trực tiếp chỉ được phân công nhân viên đơn vị công tác vào làm việc tại vị trí làm việc kế tiếp sau khi đã thực hiện đủ, đúng các biện pháp an toàn theo yêu cầu công việc", "Cả a, b và c"], correct: 2 },
+            { id: 148, q: "Khi làm việc lần lượt ở nhiều nơi với 01 phiếu công tác, thì ở những nơi không có nhân viên vận hành trực thường xuyên, khi di chuyển đến nơi (vị trí) làm việc tiếp theo phải:", options: ["Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý công trình về những nơi (vị trí) sẽ di chuyển trong quá trình làm công việc", "Phải được sự chỉ dẫn chi tiết từ ban đầu của người lãnh đạo công việc", "Trước khi di chuyển người chỉ huy trực tiếp phải thông báo để người lãnh đạo công việc (hoặc Trưởng ca trực vận hành) chấp thuận", "Người chỉ huy trực tiếp chỉ được phân công nhân viên đơn vị công tác vào làm việc tại vị trí làm việc kế tiếp sau khi đã thực hiện đủ, đúng các biện pháp an toàn theo yêu cầu công việc"], correct: 3 },
+            { id: 149, q: "Khi di chuyển nơi làm việc trong phạm vi cho phép của phiếu công tác, người chỉ huy trực tiếp và toàn đơn vị công tác chỉ được làm việc ở những vị trí nào?", options: ["Ở một nơi (vị trí) xác định trong các vị trí cần di chuyển tới", "Được làm việc ở một số vị trí mà người chỉ huy giám sát được hết nhân viên đơn vị", "Có thể tổ chức cùng làm việc nhiều vị trí trong phạm vi cho phép của phiếu công tác", "Cả a, b và c"], correct: 0 },
+            { id: 150, q: "Ở nơi có nhân viên trực vận hành thường xuyên, khi di chuyển đến vị trí làm việc tiếp theo trong một phiếu công tác, cần phải tổ chức cho phép như thế nào?", options: ["Không cần làm thủ tục cho phép", "Do người cho phép tiến hành thủ tục cho phép làm việc", "Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành", "Cả a, b và c"], correct: 1 },
+            { id: 151, q: "Ở nơi không có nhân viên trực vận hành, khi di chuyển đến vị trí làm việc tiếp theo trong một phiếu công tác, cần phải tổ chức cho phép như thế nào?", options: ["Không cần làm thủ tục cho phép", "Do người cho phép tiến hành thủ tục cho phép làm việc", "Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành", "Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành về những nơi (vị trí) sẽ di chuyển trong quá trình làm công việc và phải được sự chỉ dẫn chi tiết từ ban đầu của người cho phép"], correct: 3 },
+            { id: 152, q: "Khi di chuyển mà ở nơi làm việc tiếp theo không được cắt điện hoặc phải thực hiện cắt điện, hay có cấp điện áp khác, thì phải làm thủ tục như thế nào?", options: ["Do người cho phép tiến hành thủ tục cho phép làm việc", "Cho phép làm việc theo phiếu công tác mới", "Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành", "Có sự thống nhất giữa đơn vị làm công việc với đơn vị quản lý vận hành về những nơi (vị trí) sẽ di chuyển trong quá trình làm công việc và phải được sự chỉ dẫn chi tiết từ ban đầu của người cho phép."], correct: 1 },
+            { id: 153, q: "Nếu công việc phải kéo dài nhiều ngày thì sau mỗi ngày làm việc đơn vị công tác phải:", options: ["Thu dọn nơi làm việc, lối đi; tháo gỡ biển báo, rào chắn, nối (tiếp) đất.", "Thu dọn nơi làm việc, lối đi; giữ nguyên biển báo, rào chắn, nối (tiếp) đất. Trong mọi trường hợp người CHTT được giữ lại Phiếu công tác.", "Thu dọn nơi làm việc, lối đi; giữ nguyên biển báo, rào chắn, nối (tiếp) đất. Người CHTT phải giao lại Phiếu công tác và những việc liên quan cho người cho phép, đồng thời hai bên phải cùng ký vào phiếu.", "Cả a, b và c."], correct: 2 },
+            { id: 154, q: "Khi cấp phiếu công tác phải thực hiện theo những quy định nào sau đây:", options: ["Theo đúng mẫu, nội dung ghi dễ hiểu, đủ và đúng theo yêu cầu công việc; cấm tẩy xóa, viết bằng bút chì, rách nát, nhòe chữ", "Lập thành 02 bản, do người cấp phiếu trực tiếp ký và giao cho người cho phép mang đến hiện trường để làm thủ tục cho phép làm việc.", "Trường hợp người cho phép kiêm người chỉ huy trực tiếp thì được phép lập, sử dụng 01 bản và phải tuân thủ đầy đủ trình tự, thủ tục, nội dung công việc của các chức danh này", "Cả a, b và c"], correct: 3 },
+            { id: 155, q: "Khi cấp phiếu công tác phải thực hiện theo những quy định nào sau đây:", options: ["Theo đúng mẫu, nội dung ghi dễ hiểu, đủ và đúng theo yêu cầu công việc; cấm tẩy xóa, viết bằng bút chì, rách nát, nhòe chữ", "Lập thành 02 bản, do người cấp phiếu trực tiếp ký và giao cho người chỉ huy trực tiếp mang đến hiện trường để làm thủ tục cho phép làm việc.", "Trường hợp người cho phép kiêm người lãnh đạo công việc thì được phép lập, sử dụng 01 bản và phải tuân thủ đầy đủ trình tự, thủ tục, nội dung công việc của các chức danh này", "Cả a, b và c"], correct: 0 },
+            { id: 156, q: "Theo quy trình an toàn điện, phiếu công tác được quy định như thế nào là đúng:", options: ["Là giấy giao nhiệm vụ làm việc ở thiết bị điện", "Là giấy cho phép đơn vị công tác làm việc ở thiết bị điện", "Là giấy ghi những biện pháp đảm bảo an toàn khi làm việc ở thiết bị điện", "Cả a, b và c"], correct: 1 },
+            { id: 157, q: "Theo quy trình an toàn điện, phiếu công tác do người nào có quyền cấp?", options: ["Người được giao nhiệm vụ của đơn vị công tác", "Người được giao nhiệm vụ của đơn vị quản lý vận hành", "Nhân viên trực ca đương nhiệm của đơn vị quản lý vận hành", "Cả b và c"], correct: 1 },
+            { id: 158, q: "Khi tổ chức làm công việc trên thiết bị điện, phiếu công tác được cấp theo nguyên tắc nào?", options: ["Mỗi đơn vị công tác có thể được cấp nhiều phiếu công tác một lần cho nhiều công việc", "Nhiều đơn vị công tác làm trên một hệ thống lưới điện được cấp một phiếu công tác", "Mỗi đơn vị công tác chỉ được cấp một phiếu công tác cho một hoặc một số công việc được chuẩn bị biện pháp an toàn chung ngay từ khi cho phép", "cả a, b và c đều sai"], correct: 2 },
+            { id: 159, q: "Khi tổ chức làm công việc trên thiết bị điện, phiếu công tác được cấp theo nguyên tắc nào?", options: ["Mỗi đơn vị công tác có thể được cấp nhiều phiếu công tác một lần cho nhiều công việc", "Nhiều đơn vị công tác làm trên một hệ thống lưới điện được cấp một phiếu công tác", "Mỗi đơn vị công tác chỉ được cấp một phiếu công tác cho một hoặc một số công việc tương tự nhau và phải có người lãnh đạo công việc", "Cả a, b và c đều sai"], correct: 3 },
+            { id: 160, q: "Trong trường hợp, phải cử riêng người giám sát an toàn điện cho đơn vị công tác thì tại hiện trường, sau khi ký cho phép, phiếu công tác được giao cho những người nào?", options: ["Người cho phép giữ 01 bản và người giám sát an toàn điện giữ 01 bản", "Người cho phép giữ 01 bản và người chỉ huy trực tiếp giữ 01 bản", "Người chỉ huy trực tiếp giữ 01 bản và người giám sát an toàn điện giữ 01 bản", "Người chỉ huy trực tiếp và người giám sát an toàn điện giữ chung 01 bản, còn người cho phép giữ riêng 01 bản"], correct: 1 },
+            { id: 161, q: "Trong trường hợp nào thì phiếu công tác được phép lập thành 01 bản?", options: ["Người cho phép kiêm người giám sát an toàn điện", "Người cho phép kiêm người chỉ huy trực tiếp", "Người giám sát an toàn điện kiêm người người chỉ huy trực tiếp", "Người cấp phiếu kiêm người người chỉ huy trực tiếp"], correct: 1 },
+            { id: 162, q: "Trong quá trình thực hiện công việc, nếu thấy có việc phát sinh cần xử lý ở ngoài phạm vi được phép làm việc của phiếu công tác thì giải quyết như thế nào?", options: ["Phải cấp phiếu công tác mới cho công việc đó", "Người chỉ huy trực tiếp tổ chức biện pháp an toàn để thực hiện, ghi thêm vào phiếu đang làm", "Người chỉ huy trực tiếp báo cho người cho phép biết và tổ chức biện pháp an toàn để thực hiện, đồng thời ghi thêm vào phiếu đang công tác", "Cả a và c"], correct: 0 },
+            { id: 163, q: "Trong các trường hợp dưới đây, phiếu công tác phải được thực hiện như thế nào cho đúng quy định:", options: ["Sau khi hoàn thành công việc, phiếu công tác được giao trả lại người cấp phiếu để kiểm tra, lưu giữ ít nhất 15 ngày", "Thực hiện theo a cho cả những phiếu công tác đã cấp nhưng không thực hiện", "Trường hợp khi tiến hành công việc, nếu để xảy ra sự cố hoặc tai nạn thì phiếu công tác phải được lưu trong hồ sơ điều tra sự cố, tai nạn lao động của đơn vị", "Cả a, b và c"], correct: 3 },
+            { id: 164, q: "Số lượng điều kiện của tổ máy ở trạng thái dự phòng, đèn Stop sáng theo nhà máy Đồng Nai 5?", options: ["28", "25", "31", "40"], correct: 0 },
+            { id: 165, q: "Điều kiện tổ máy xác lập Novolt?", options: ["Tốc độ tổ máy lớn hơn 85%đm;", "Tốc độ tổ máy lớn hơn 95%đm;", "Tốc độ tổ máy lớn hơn 90%đm;", "Tốc độ tổ máy nhỏ hơn 90%đm;"], correct: 2 },
+            { id: 166, q: "Điều kiện tổ máy xác lập Noload?", options: ["Điện áp đầu cực lớn hơn 95%đm;", "Điện áp đầu cực lớn hơn 90%đm;", "Điện áp đầu cực lớn hơn 90%đm;", "Điện áp đầu cực nhỏ hơn 95%đm;"], correct: 0 },
+            { id: 167, q: "Điều kiện logic điều khiển thỏa bước 1 khởi động tổ máy từ dừng lên phát?", options: ["Tín hiệu bộ sấy máy phát đã ngừng", "Tín hiệu bộ hút hơi dầu máy phát đã ngừng", "Tín hiệu bộ giám sát tốc độ bò máy phát đã ngừng", "Tín hiệu nước máy phát đã sẵn sàng"], correct: 0 },
+            { id: 168, q: "Điều kiện logic điều khiển thỏa bước 2 khởi động tổ máy từ dừng lên phát?", options: ["Áp lực nước làm mát gió máy phát và làm mát dầu các ổ bình thường", "Áp lực nước làm mát mát dầu các ổ bình thường", "Áp lực nước làm mát gió máy phát và làm mát dầu ổ HTren bình thường", "Áp lực nước làm mát gió máy phát bình thường"], correct: 0 },
+            { id: 169, q: "Điều kiện logic điều khiển thỏa bước 3 khởi động tổ máy từ dừng lên phát?", options: ["Đệm kín khí đã ngừng", "Đệm kín khí làm việc", "Hệ thống nước sẵn sàng", "Hệ thống khí sẵn sàng"], correct: 0 },
+            { id: 170, q: "Điều kiện logic điều khiển thỏa bước 4 khởi động tổ máy từ dừng lên phát?", options: ["Lock servo cánh hướng đã mở", "Lock servo cánh hướng Off", "servo cánh hướng đã mở", "Hệ thống điều tốc sẵn sàng"], correct: 0 },
+            { id: 171, q: "Điều kiện logic điều khiển thỏa bước 6 khởi động tổ máy từ dừng lên phát?", options: ["FCB closed", "FCB On", "GCB closed", "FCB Off"], correct: 0 },
+            { id: 172, q: "Điều kiện để cắt GCB khi đang dừng tổ máy từ chế độ phát?", options: ["Công suất P<1.5MW; Công suất Q<2MVAR. Hoặc cánh hướng đóng về không tải", "Công suất P<2MW; Công suất Q<2MVAR", "Công suất P<2MW; Công suất Q<2.5MVAR. Hoặc cánh hướng đóng về không tải", "Công suất P<2MW; Công suất Q<1.5MVAR. Hoặc cánh hướng đóng về không tải"], correct: 1 },
+            { id: 173, q: "Điều kiện logic điều khiển để thực hiện bước 7 khi đang dừng tổ máy?", options: ["Quạt hút bụi thắng 1 ON# hoặc 2# đã ON", "Quạt hút bụi thắng 1 ON # Và 2# đã ON", "Quạt hút bụi thắng 1# hoặc 2# đã ON", "Quạt hút bụi thắng 1# hoặc 2# đã ON"], correct: 0 },
+            { id: 174, q: "Trình tự tác động tổ máy khi bị sự cố 40 – bảo vệ mất kích thích máy phát?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 175, q: "Trình tự tác động tổ máy khi bị sự cố 32 – bảo vệ công suất ngược?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 176, q: "Trình tự tác động tổ máy khi bị sự cố 78 – bảo vệ mất đồng bộ?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 177, q: "Trình tự tác động tổ máy khi bị sự cố 46 – bảo vệ dòng thứ tự nghịch?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 178, q: "Trình tự tác động tổ máy khi bị sự cố 49G – bảo vệ quá tải máy phát?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 179, q: "Trình tự tác động tổ máy khi bị sự cố 24G – bảo vệ quá từ thông máy phát?", options: ["Cắt GCB; Cắt FCB; Dừng sự cố điện.", "Cắt GCB; Cắt FCB; Tổ máy về Novolt.", "Cắt GCB; Cắt FCB; Tổ máy về Noload.", "Cắt GCB; Tổ máy về Noload."], correct: 0 },
+            { id: 180, q: "Trình tự tác động tổ máy khi bị sự cố 51T – bảo vệ quá dòng máy biến thế chính T1?", options: ["Cắt 901, FCB; Cắt MC 271,273, Q01", "Cắt 901, FCB; Cắt MC 271,273, QFB1; Dừng sự cố điện.", "Cắt 901; Cắt MC 271,273; Tổ máy về Noload.", "Cắt 901, FCB; Cắt MC 271,273; Tổ máy về Novolt."], correct: 2 },
+
+            // --- 30 CÂU BẢNG AN TOÀN ĐIỆN ĐỐI SOÁT CUỐI ĐỀ CƯƠNG ---
+            { id: 181, q: "[An toàn Đề 1] Phiếu thao tác thực hiện xong:", options: ["Phiếu thao tác thực hiện xong phải được lưu ít nhất 01 tháng.", "Phiếu thao tác thực hiện xong phải được lưu ít nhất 03 tháng.", "Trường hợp thao tác có liên quan đến sự cố, tai nạn thì các phiếu thao tác có liên quan phải được lưu trong hồ sơ điều tra sự cố, tai nạn lao động của đơn vị.", "Cả B và C."], correct: 3 },
+            { id: 182, q: "[An toàn Đề 2] Thao tác đóng, cắt ở thiết bị điện cao áp, cần:", options: ["1 người với thao tác đơn giản, có bậc an toàn điện 4/5.", "Ít nhất phải do 2 người thực hiện. Người thao tác có bậc 3 ATĐ trở lên, người giám sát thao tác có bậc 4 ATĐ trở lên.", "Ít nhất phải do 2 người thực hiện, một người thao tác (bậc ≥ 3) và một người giám sát (bậc ≥ 4), phải hiểu rõ sơ đồ và vị trí thiết bị tại hiện trường.", "Tất cả đều sai."], correct: 2 },
+            { id: 183, q: "[An toàn Đề 3] Đối với thiết bị ngoài trời trong lúc mưa to nước chảy thành dòng trên thiết bị, dụng cụ an toàn hoặc đang có giông sét thì:", options: ["Cấm đóng, cắt điện bằng sào thao tác và dao cách ly thao tác trực tiếp tại chỗ hoặc thay dây chì.", "Được phép đóng, cắt dao cách ly ở những đường dây không có điện.", "Cho phép đóng cắt điện bằng sào thao tác nếu mang đủ găng ủng cách điện.", "A và B đều đúng."], correct: 3 },
+            { id: 184, q: "[An toàn Đề 4] Khi gặp sự cố có thể gây nguy hiểm cho người hoặc hư hại thiết bị. Nhân viên vận hành được phép:", options: ["Cắt điện ngay.", "Báo cho người phụ trách để xử lý.", "Cắt điện ngay sau đó phải báo cho nhân viên vận hành cấp trên và người phụ trách trực tiếp của mình biết nội dung những việc đã làm, sau đó ghi đầy đủ vào nhật ký vận hành.", "Chỉ được cắt điện khi có lệnh hoặc Phiếu theo quy trình."], correct: 2 },
+            { id: 185, q: "[An toàn Đề 5] Đóng, cắt dao cách ly trên cột với cấp điện áp ≤ 35kV bằng sào cách điện khi điều kiện khoảng cách từ phần dẫn điện thấp nhất đến người thao tác không nhỏ hơn:", options: ["3 mét", "2 mét", "1 mét", "0.5 mét"], correct: 0 },
+            { id: 186, q: "[An toàn Đề 6] Tiếp đất nơi làm việc có cắt điện thì phải thực hiện như thế nào?", options: ["Phải tiếp đất ngay sau khi thử hết điện.", "Tiếp đất ở tất cả các pha của thiết bị về phía có khả năng dẫn điện đến.", "Đảm bảo khoảng cách an toàn và đảm bảo cho toàn bộ đơn vị công tác nằm trọn trong vùng bảo vệ của nối đất.", "Cả A, B, C."], correct: 3 },
+            { id: 187, q: "[An toàn Đề 7] Lắp và tháo tiếp đất phải thực hiện như thế nào:", options: ["Lắp và tháo tiếp đất do hai người thực hiện, trong đó một người phải có bậc ATĐ từ bậc 4 trở lên, người còn lại từ bậc 3 trở lên.", "Khi lắp tiếp đất phải đấu một đầu dây tiếp đất với đất trước, sau đó dùng sào cách điện lắp đầu còn lại vào dây dẫn. Tháo tiếp đất làm ngược lại.", "Đầu dây đấu xuống đất phải bắt bằng bu-lông, cấm vặn xoắn. Nếu đấu vào tiếp đất cột/hệ thống chung phải cạo sạch rỉ chỗ đấu.", "Cả A, B và C."], correct: 3 },
+            { id: 188, q: "[An toàn Đề 8] Việc trao trả nơi làm việc, khóa phiếu và đóng điện phải thực hiện như thế nào là đúng quy định:", options: ["Bàn giao trao trả nơi làm việc, khóa phiếu phải được tiến hành trực tiếp giữa đơn vị công tác và đơn vị quản lý vận hành thiết bị.", "Người chỉ huy trực tiếp ký vào Mục 6.1 kết thúc công tác.", "Người cho phép sau khi kiểm tra lại tại nơi làm việc không còn tiếp đất di động đảm bảo an toàn mới được ký khóa phiếu vào Mục 6.2 và báo cáo Trưởng ca.", "Cả A, B và C."], correct: 3 },
+            { id: 189, q: "[An toàn Đề 9] Những biện pháp kỹ thuật chuẩn bị nơi làm việc phải cắt điện bao gồm: (1. Cắt điện; 2. Đặt tiếp đất; 3. Kiểm tra không còn điện; 4. Đặt rào chắn, treo biển báo)", options: ["Theo trình tự 1-2-3-4.", "Theo trình tự 1-3-2-4.", "Theo trình tự 1-4-3-2.", "Theo trình tự 4-1-3-2."], correct: 1 },
+            { id: 190, q: "[An toàn Đề 10] Khi kiểm tra không còn điện thì phải thực hiện như thế nào cho đúng quy trình an toàn điện:", options: ["Người thực hiện thao tác cắt điện đồng thời phải tiến hành kiểm tra không còn điện ở các thiết bị đã cắt điện.", "Kiểm tra không còn điện bằng thiết bị thử điện chuyên dùng phù hợp với điện áp danh định; phải thử ở tất cả các pha và các phía vào, ra.", "Có thể căn cứ tín hiệu đèn, rơ le, đồng hồ để xác nhận thiết bị không còn điện.", "Cả A và B."], correct: 3 },
+            { id: 191, q: "[An toàn Đề 11] Được phép tiến hành đặt tiếp đất lưu động:", options: ["Sau khi cắt điện.", "Sau khi kiểm tra không còn điện.", "Nếu có giám sát an toàn.", "Nếu có hai người thực hiện."], correct: 1 },
+            { id: 192, q: "[An toàn Đề 12] Theo quy trình an toàn điện, phiếu công tác được quy định như thế nào là đúng:", options: ["Là giấy giao nhiệm vụ làm việc ở thiết bị điện.", "Là giấy cho phép đơn vị công tác làm việc với thiết bị điện và phòng ngừa để không xảy ra tai nạn điện.", "Là giấy ghi những biện pháp đảm bảo an toàn khi làm việc ở thiết bị điện.", "Cả A, B và C."], correct: 1 },
+            { id: 193, q: "[An toàn Đề 13] Những công việc có cắt điện nhưng phải gỡ dây tiếp địa để công tác là:", options: ["Kiểm tra hệ thống tiếp địa của hệ thống trạm.", "Củng cố lại tiếp đất của thiết bị hoặc cả hệ thống trạm.", "Kiểm tra cách điện của các thiết bị.", "Cả 3 nội dung A, B, C đều đúng."], correct: 3 },
+            { id: 194, q: "[An toàn Đề 14] Khi máy cắt đang vận hành bình thường thì:", options: ["Có thể làm việc nếu có Phiếu công tác và giám sát an toàn đầy đủ.", "Có thể lau chùi sứ cách điện bằng chổi lông gắn trên sứ cách điện.", "Cấm sửa chữa ở các máy cắt đang vận hành (kể cả việc lau sứ cách điện bằng thiết bị chuyên dùng).", "Cả hai nội dung A và B đều đúng."], correct: 2 },
+            { id: 195, q: "[An toàn Đề 15] Trong quá trình thực hiện công việc, nếu thấy có việc phát sinh cần xử lý ở ngoài phạm vi được phép làm việc của phiếu công tác thì giải quyết như thế nào?", options: ["Phải cấp phiếu công tác mới cho công việc đó.", "Người chỉ huy trực tiếp tổ chức biện pháp an toàn để thực hiện, ghi thêm vào phiếu đang làm.", "Người chỉ huy trực tiếp báo cho người cho phép biết và tổ chức biện pháp an toàn để thực hiện.", "Cả A và C."], correct: 0 },
+            { id: 196, q: "[An toàn Đề 16] Trong điều kiện vận hành bình thường người giám sát thao tác và người thao tác phải thực hiện những quy định nào?", options: ["Khi nhận phiếu thao tác phải đọc kỹ và kiểm tra lại nội dung thao tác theo sơ đồ, nếu chưa rõ thì phải hỏi lại người ra lệnh.", "Nếu nhận lệnh bằng điện thoại thì người giám sát thao tác phải ghi đầy đủ lệnh đó và nhắc lại từng động tác trong điện thoại, ghi âm lại, ghi sổ nhật ký vận hành.", "Người giám sát thao tác và người thao tác cùng ký vào phiếu, mang phiếu đến địa điểm thao tác.", "Phải bao gồm cả A, B và C."], correct: 3 },
+            { id: 197, q: "[An toàn Đề 17] Tới nơi thao tác, người giám sát và người thao tác phải thực hiện:", options: ["Cùng ký vào phiếu thao tác.", "Tới nơi thao tác phải kiểm tra lại một lần nữa theo sơ đồ và đối chiếu vị trí thiết bị trên thực tế đúng với nội dung ghi trong phiếu, kiểm tra trở ngại xung quanh.", "Cả A và B đều đúng.", "Cả A, B và C đều sai."], correct: 2 },
+            { id: 198, q: "[An toàn Đề 18] Cắt điện để làm công việc phải thực hiện như thế nào cho đúng quy trình an toàn điện:", options: ["Phần thiết bị tiến hành công việc phải được nhìn thấy rõ đã cách ly khỏi các phần có điện từ mọi phía.", "Cấm cắt điện để làm việc chỉ bằng máy cắt, dao phụ tải và dao cách ly có bộ truyền động tự động.", "Phải ngăn chặn được những nguồn điện cao, hạ áp qua MBA lực, MBA đo lường, máy phát khác có điện ngược trở lại.", "Thực hiện theo cả A, B và C."], correct: 3 },
+            { id: 199, q: "[An toàn Đề 19] Chuẩn bị nơi làm việc để đảm bảo an toàn khi tiến hành công việc thì phương pháp làm rào chắn như thế nào là đúng:", options: ["Rào chắn tạm thời bằng vật liệu khô chắc chắn; khoảng cách an toàn phụ thuộc từng cấp điện áp.", "Ở cấp điện áp đến 15kV, rào chắn tạm thời cách điện được chạm vào phần có điện dưới sự giám sát của người có bậc 5 an toàn điện.", "Rào chắn tạm thời phải đặt sao cho khi có nguy hiểm người làm việc dễ dàng thoát ra khỏi vùng nguy hiểm.", "Cả A, B và C đều đúng"], correct: 3 },
+            { id: 200, q: "[An toàn Đề 20] Khi cấp phiếu công tác phải thực hiện theo những quy định nào sau đây:", options: ["Theo đúng mẫu, nội dung ghi dễ hiểu, đủ và đúng; cấm tẩy xóa, viết bằng bút chì, rách nát.", "Lập thành 02 bản, do người cấp phiếu trực tiếp ký và giao cho người cho phép mang đến hiện trường.", "Trường hợp người cho phép kiêm người chỉ huy trực tiếp thì được phép lập, sử dụng 01 bản.", "Cả A, B và C."], correct: 3 },
+            { id: 201, q: "[An toàn Đề 21] Biện pháp tổ chức để đảm bảo an toàn khi làm việc ở thiết bị điện bao gồm:", options: ["Khảo sát, lập biên bản hiện trường (nếu cần thiết).", "Đăng ký công tác.", "Làm việc theo Phiếu công tác hoặc Lệnh công tác.", "Khảo sát hiện trường; Đăng ký công tác; Làm việc theo Phiếu công tác hoặc Lệnh công tác."], correct: 3 },
+            { id: 202, q: "[An toàn Đề 22] Phiếu công tác là:", options: ["Mỗi Phiếu công tác chỉ được cấp cho 01 đơn vị công tác để làm 01 công việc.", "Mỗi Phiếu công tác có thể cấp cho 02 đơn vị công tác để làm 02 công việc.", "Mỗi Phiếu công tác có thể cấp cho 02 đơn vị công tác để làm 03 công việc.", "Mỗi Phiếu công tác có thể cấp cho 01 đơn vị công tác để làm 02 công việc."], correct: 0 },
+            { id: 203, q: "[An toàn Đề 23] Người chỉ huy trực tiếp:", options: ["Phải có bậc 4 an toàn điện trở lên.", "Được công nhận chức danh Người CHTT, hàng năm được huấn luyện, sát hạch đạt yêu cầu.", "Phải nắm vững thời gian, địa điểm, nội dung công việc và biện pháp an toàn.", "Phải có bậc 4 ATĐ trở lên, nắm vững nội dung công việc, được quyết định công nhận chức danh Người CHTT."], correct: 3 },
+            { id: 204, q: "[An toàn Đề 24] Trách nhiệm của người chỉ huy trực tiếp:", options: ["Chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc; kiểm tra sơ bộ tình trạng sức khỏe, trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác.", "Phân công người chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc.", "Chuẩn bị dụng cụ an toàn; kiểm tra trang bị phương tiện bảo vệ cá nhân.", "Phân công người kiểm tra sức khỏe của nhân viên đơn vị công tác."], correct: 0 },
+            { id: 205, q: "[An toàn Đề 25] Trách nhiệm của người chỉ huy trực tiếp khi nhận bàn giao nơi làm việc:", options: ["Tại hiện trường cử 1 nhân viên có kinh nghiệm kiểm tra tiếp nhận biện pháp an toàn.", "Tại hiện trường phải kiểm tra, tiếp nhận các biện pháp an toàn nơi làm việc do người cho phép giao và thực hiện các biện pháp an toàn cần thiết khác.", "Tại hiện trường cử 2 nhân viên có kinh nghiệm kiểm tra tiếp nhận biện pháp an toàn.", "Cử người kiểm tra yếu tố nguy hiểm nơi làm việc."], correct: 1 },
+            { id: 206, q: "[An toàn Đề 26] Khi tạm ngừng công việc trong ngày để nghỉ giải lao (ăn trưa), đối với công việc cắt điện từng phần hoặc không cắt điện:", options: ["Phải rút toàn bộ đơn vị công tác ra khỏi nơi làm việc, các biện pháp an toàn vẫn giữ nguyên, chỉ được vào làm việc trở lại khi người CHTT kiểm tra đủ an toàn.", "Phải rút toàn bộ đơn vị công tác ra khỏi nơi làm việc, tháo gỡ các biện pháp an toàn.", "Đơn vị công tác nghỉ ăn trưa tại chỗ, các biện pháp an toàn phải giữ nguyên.", "Phải trả lại vị trí công tác cho người cho phép."], correct: 0 },
+            { id: 207, q: "[An toàn Đề 27] Để tránh đóng điện nhầm vào thiết bị có người đang làm việc:", options: ["Các bộ phận truyền động của dao cách ly phải khóa lại, chìa khóa do người trực ca vận hành giữ.", "Các bộ phận truyền động của dao cách ly phải khóa lại và treo biển báo an toàn, chìa khóa do người cắt điện hay người trực ca vận hành giữ.", "Phải cử người trông coi không cho ai đóng điện.", "Treo biển Cấm mở! Có người đang làm việc tại bộ phận truyền động."], correct: 1 },
+            { id: 208, q: "[An toàn Đề 28] Những người được phép tháo các biển báo ở bộ phận truyền động của máy cắt, DCL mà từ đó có thể đóng điện đến nơi làm việc là:", options: ["Nhân viên của đơn vị QLVH thiết bị sau khi được sự cho phép của điều độ.", "Nhân viên thao tác (Người treo biển báo) hoặc người được chỉ định thay thế.", "Người của nhóm công tác khi thực hiện thủ tục kết thúc công tác.", "Cả 3 câu đều đúng nhưng phải có trình độ an toàn bậc 5/5."], correct: 1 },
+            { id: 209, q: "[An toàn Đề 29] Khi được phân công làm nhiệm vụ giám sát an toàn điện đội công tác, người giám sát:", options: ["Có thể ủy quyền cho công nhân bậc cao thực hiện nhiệm vụ giám sát thay.", "Phải luôn luôn có mặt tại nơi đội công tác làm việc.", "Có thể vắng mặt trong thời gian ngắn.", "Không phải thực hiện giám sát."], correct: 1 },
+            { id: 210, q: "[An toàn Đề 30] Trước khi cho đơn vị công tác vào làm việc ai chịu trách nhiệm giải thích về nội dung, trình tự thực hiện công việc và các biện pháp an toàn?", options: ["Người chỉ huy trực tiếp.", "Người cấp phiếu.", "Người lãnh đạo công việc.", "Người cho phép."], correct: 0 }
+        ];
+
+        /* ==================== 2. QUẢN LÝ CÂU SAI ==================== */
+        const WRONG_POOL_KEY = 'dn5_wrong_question_ids';
+
+        function getSavedWrongIds() {
+            try {
+                return JSON.parse(localStorage.getItem(WRONG_POOL_KEY) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveWrongIds(ids) {
+            const uniqueIds = Array.from(new Set(ids)).filter(id => MASTER_QUESTIONS.some(q => q.id === id));
+            localStorage.setItem(WRONG_POOL_KEY, JSON.stringify(uniqueIds));
+            updateWrongCounterUI();
+        }
+
+        function clearAllWrongIds() {
+            localStorage.removeItem(WRONG_POOL_KEY);
+            updateWrongCounterUI();
+        }
+
+        function updateWrongCounterUI() {
+            const count = getSavedWrongIds().length;
+            const counterEl = document.getElementById('wrong-questions-count');
+            const btnPracticeMain = document.getElementById('btn-practice-wrong-main');
+            const btnClearMain = document.getElementById('btn-clear-wrong-main');
+
+            if (counterEl) counterEl.textContent = count;
+            if (btnPracticeMain) btnPracticeMain.disabled = (count === 0);
+            if (btnClearMain) btnClearMain.disabled = (count === 0);
+        }
+
+        /* ==================== 3. THUẬT TOÁN PHÂN CHIA 10 BỘ ĐỀ ==================== */
+        function generateFixedSet(setNumber) {
+            const setIndex = setNumber - 1;
+            const total = MASTER_QUESTIONS.length;
+            const selected = [];
+            
+            for (let i = 0; i < 30; i++) {
+                const questionIndex = (setIndex * 7 + i * 7) % total;
+                const q = MASTER_QUESTIONS[questionIndex];
+                if (!selected.some(item => item.id === q.id)) {
+                    selected.push(q);
+                }
+            }
+            let fillIndex = 0;
+            while (selected.length < 30) {
+                const candidate = MASTER_QUESTIONS[fillIndex % total];
+                if (!selected.some(item => item.id === candidate.id)) {
+                    selected.push(candidate);
+                }
+                fillIndex++;
+            }
+            return selected;
+        }
+
+        /* ==================== 4. APPLICATION STATE ==================== */
+        let state = {
+            studentName: 'Thí sinh',
+            studentRole: 'Điều Hành Viên',
+            selectedSetKey: '1',
+            isRetryingWrong: false,
+            durationMinutes: 30,
+            serverUrl: 'http://localhost:5000/api/submit-quiz',
+            
+            questions: [],
+            userAnswers: {},
+            flaggedQuestions: {},
+            currentQuestionIdx: 0,
+            timeRemainingSeconds: 0,
+            timerInterval: null,
+            isSubmitted: false,
+            startTime: null,
+            endTime: null
+        };
+
+        /* ==================== 5. DOM REFERENCES ==================== */
+        const configScreen = document.getElementById('config-screen');
+        const examScreen = document.getElementById('exam-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const setupForm = document.getElementById('quiz-setup-form');
+
+        const countdownTimerEl = document.getElementById('countdown-timer');
+        const answeredCountEl = document.getElementById('answered-count');
+        const totalQCountBadge = document.getElementById('total-q-count-badge');
+        const btnSubmitExam = document.getElementById('btn-submit-exam');
+        const headerUserBadge = document.getElementById('header-user-badge');
+        const navUserName = document.getElementById('nav-user-name');
+        const navExamName = document.getElementById('nav-exam-name');
+
+        const currentQBadge = document.getElementById('current-q-badge');
+        const currentQOriginId = document.getElementById('current-q-origin-id');
+        const currentQText = document.getElementById('current-question-text');
+        const answerOptionsContainer = document.getElementById('answer-options-container');
+        const paletteContainer = document.getElementById('palette-container');
+        const paletteExamId = document.getElementById('palette-exam-id');
+        const btnPrevQ = document.getElementById('btn-prev-q');
+        const btnNextQ = document.getElementById('btn-next-q');
+        const btnFlagQ = document.getElementById('btn-flag-q');
+        const flagIcon = document.getElementById('flag-icon');
+        const flagText = document.getElementById('flag-text');
+
+        const resStudentInfo = document.getElementById('res-student-info');
+        const resScore = document.getElementById('res-score');
+        const resCorrectCount = document.getElementById('res-correct-count');
+        const resTimeTaken = document.getElementById('res-time-taken');
+        const resBadgeStatus = document.getElementById('res-badge-status');
+        const serverSyncFeedback = document.getElementById('server-sync-feedback');
+        const reviewList = document.getElementById('review-list');
+        const btnScrollReview = document.getElementById('btn-scroll-review');
+        const btnRestartQuiz = document.getElementById('btn-restart-quiz');
+        const resultWrongAlert = document.getElementById('result-wrong-alert');
+        const resultWrongText = document.getElementById('result-wrong-text');
+        const btnPracticeWrongResult = document.getElementById('btn-practice-wrong-result');
+        const btnClearWrongResult = document.getElementById('btn-clear-wrong-result');
+
+        const btnPracticeWrongMain = document.getElementById('btn-practice-wrong-main');
+        const btnClearWrongMain = document.getElementById('btn-clear-wrong-main');
+
+        /* ==================== 6. XỬ LÝ SỰ KIỆN CÂU SAI ==================== */
+        btnClearWrongMain.addEventListener('click', () => {
+            if (confirm("Bạn có chắc chắn muốn xóa sạch toàn bộ danh sách các câu làm sai đã lưu không? Sau khi xóa sẽ không lưu các câu này nữa.")) {
+                clearAllWrongIds();
+                alert("Đã xóa toàn bộ câu sai khỏi bộ nhớ thành công!");
+            }
+        });
+
+        btnClearWrongResult.addEventListener('click', () => {
+            if (confirm("Bạn có chắc chắn muốn xóa các câu làm sai? Sau khi xóa, hệ thống sẽ reset về 0 câu sai.")) {
+                clearAllWrongIds();
+                resultWrongAlert.classList.add('hidden');
+                alert("Đã xóa sạch danh sách câu sai!");
+            }
+        });
+
+        btnPracticeWrongMain.addEventListener('click', () => {
+            const wrongIds = getSavedWrongIds();
+            if (wrongIds.length === 0) {
+                alert("Hiện tại không có câu làm sai nào cần luyện tập!");
+                return;
+            }
+            startWrongPracticeExam(wrongIds);
+        });
+
+        btnPracticeWrongResult.addEventListener('click', () => {
+            const wrongIds = getSavedWrongIds();
+            if (wrongIds.length === 0) {
+                alert("Bạn đã làm đúng toàn bộ, không có câu sai nào cần ôn lại!");
+                return;
+            }
+            startWrongPracticeExam(wrongIds);
+        });
+
+        function startWrongPracticeExam(wrongIds) {
+            state.isRetryingWrong = true;
+            state.selectedSetKey = 'wrong_pool';
+            state.questions = MASTER_QUESTIONS.filter(q => wrongIds.includes(q.id));
+            state.durationMinutes = Math.max(5, Math.ceil(state.questions.length * 1));
+            
+            navExamName.textContent = `Bộ đề: Ôn Lại Câu Sai (${state.questions.length} câu)`;
+            paletteExamId.textContent = "Đề Câu Sai";
+
+            launchQuizUI();
+        }
+
+        /* ==================== 7. KHỞI TẠO BÀI THI ==================== */
+        setupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            state.isRetryingWrong = false;
+            state.selectedSetKey = document.getElementById('quiz-select-mode').value;
+            state.durationMinutes = parseInt(document.getElementById('quiz-duration').value, 10) || 30;
+
+            if (state.selectedSetKey === 'random') {
+                const shuffled = [...MASTER_QUESTIONS].sort(() => 0.5 - Math.random());
+                state.questions = shuffled.slice(0, 30);
+                navExamName.textContent = "Bộ đề: Đề Ngẫu Nhiên (30 câu)";
+                paletteExamId.textContent = "Đề Ngẫu Nhiên";
+            } else {
+                const setNum = parseInt(state.selectedSetKey, 10);
+                state.questions = generateFixedSet(setNum);
+                navExamName.textContent = `Bộ đề: Đề ${String(setNum).padStart(2, '0')} (30 câu)`;
+                paletteExamId.textContent = `Đề ${String(setNum).padStart(2, '0')}`;
+            }
+
+            launchQuizUI();
+        });
+
+        function launchQuizUI() {
+            state.userAnswers = {};
+            state.flaggedQuestions = {};
+            state.currentQuestionIdx = 0;
+            state.isSubmitted = false;
+            state.timeRemainingSeconds = state.durationMinutes * 60;
+            state.startTime = new Date();
+
+            navUserName.textContent = state.studentName;
+            headerUserBadge.classList.remove('hidden');
+            totalQCountBadge.textContent = `${state.questions.length} câu`;
+
+            configScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            examScreen.classList.remove('hidden');
+
+            buildPalette();
+            renderQuestion();
+            startCountdownTimer();
+        }
+
+        function startCountdownTimer() {
+            clearInterval(state.timerInterval);
+            renderTimer();
+
+            state.timerInterval = setInterval(() => {
+                state.timeRemainingSeconds--;
+                renderTimer();
+
+                if (state.timeRemainingSeconds <= 0) {
+                    clearInterval(state.timerInterval);
+                    alert("ĐÃ HẾT THỜI GIAN LÀM BÀI! Hệ thống đang tự động nộp bài.");
+                    handleFinalSubmit();
+                }
+            }, 1000);
+        }
+
+        function renderTimer() {
+            const m = Math.floor(state.timeRemainingSeconds / 60);
+            const s = state.timeRemainingSeconds % 60;
+            countdownTimerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            if (state.timeRemainingSeconds <= 300) {
+                countdownTimerEl.classList.add('animate-pulse');
+            } else {
+                countdownTimerEl.classList.remove('animate-pulse');
+            }
+        }
+
+        function renderQuestion() {
+            const q = state.questions[state.currentQuestionIdx];
+            currentQBadge.textContent = `Câu ${state.currentQuestionIdx + 1} / ${state.questions.length}`;
+            currentQOriginId.textContent = `Gốc: Câu ${q.id}`;
+            currentQText.textContent = q.q;
+
+            const isFlagged = !!state.flaggedQuestions[state.currentQuestionIdx];
+            if (isFlagged) {
+                flagIcon.className = "fa-solid fa-bookmark text-amber-500";
+                flagText.textContent = "Bỏ đánh dấu";
+            } else {
+                flagIcon.className = "fa-regular fa-bookmark text-slate-400";
+                flagText.textContent = "Đánh dấu nghi ngờ";
+            }
+
+            const letters = ["A", "B", "C", "D"];
+            answerOptionsContainer.innerHTML = '';
+
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = state.userAnswers[state.currentQuestionIdx] === optIdx;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `w-full text-left p-4 rounded-2xl border-2 transition flex items-start gap-3.5 ${
+                    isSelected 
+                    ? 'border-evn bg-blue-50 text-evn font-bold shadow-sm ring-1 ring-evn' 
+                    : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs shrink-0 ${
+                        isSelected ? 'bg-evn text-white' : 'bg-slate-100 text-slate-600'
+                    }">${letters[optIdx]}</span>
+                    <span class="text-sm sm:text-base leading-relaxed mt-0.5">${optText}</span>
+                `;
+
+                btn.addEventListener('click', () => {
+                    state.userAnswers[state.currentQuestionIdx] = optIdx;
+                    renderQuestion();
+                });
+
+                answerOptionsContainer.appendChild(btn);
+            });
+
+            btnPrevQ.disabled = state.currentQuestionIdx === 0;
+            btnPrevQ.classList.toggle('opacity-50', state.currentQuestionIdx === 0);
+
+            if (state.currentQuestionIdx === state.questions.length - 1) {
+                btnNextQ.innerHTML = `<span>Về đầu bài</span> <i class="fa-solid fa-rotate-left"></i>`;
+            } else {
+                btnNextQ.innerHTML = `<span>Câu Tiếp</span> <i class="fa-solid fa-chevron-right"></i>`;
+            }
+
+            updatePaletteVisuals();
+            answeredCountEl.textContent = Object.keys(state.userAnswers).length;
+        }
+
+        btnFlagQ.addEventListener('click', () => {
+            const cur = !!state.flaggedQuestions[state.currentQuestionIdx];
+            state.flaggedQuestions[state.currentQuestionIdx] = !cur;
+            renderQuestion();
+        });
+
+        btnPrevQ.addEventListener('click', () => {
+            if (state.currentQuestionIdx > 0) {
+                state.currentQuestionIdx--;
+                renderQuestion();
+            }
+        });
+
+        btnNextQ.addEventListener('click', () => {
+            if (state.currentQuestionIdx < state.questions.length - 1) {
+                state.currentQuestionIdx++;
+            } else {
+                state.currentQuestionIdx = 0;
+            }
+            renderQuestion();
+        });
+
+        function buildPalette() {
+            paletteContainer.innerHTML = '';
+            state.questions.forEach((_, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `palette-btn-${idx}`;
+                btn.className = 'w-full aspect-square rounded-xl font-black text-xs flex items-center justify-center border transition relative';
+                btn.textContent = idx + 1;
+
+                btn.addEventListener('click', () => {
+                    state.currentQuestionIdx = idx;
+                    renderQuestion();
+                });
+
+                paletteContainer.appendChild(btn);
+            });
+            updatePaletteVisuals();
+        }
+
+        function updatePaletteVisuals() {
+            state.questions.forEach((_, idx) => {
+                const btn = document.getElementById(`palette-btn-${idx}`);
+                if (!btn) return;
+
+                const isCurrent = state.currentQuestionIdx === idx;
+                const isAnswered = state.userAnswers[idx] !== undefined;
+                const isFlagged = !!state.flaggedQuestions[idx];
+
+                btn.className = 'w-full aspect-square rounded-xl font-black text-xs flex items-center justify-center border transition relative ';
+
+                if (isCurrent) {
+                    btn.className += 'ring-2 ring-evn ring-offset-2 bg-evn text-white border-transparent ';
+                } else if (isFlagged) {
+                    btn.className += 'bg-amber-400 text-amber-950 border-amber-500 ';
+                } else if (isAnswered) {
+                    btn.className += 'bg-emerald-500 text-white border-emerald-600 ';
+                } else {
+                    btn.className += 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 ';
+                }
+
+                if (isFlagged && !isCurrent) {
+                    btn.innerHTML = `${idx + 1}<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>`;
+                } else {
+                    btn.innerHTML = `${idx + 1}`;
+                }
+            });
+        }
+
+        /* ==================== 8. NỘP BÀI & XỬ LÝ ==================== */
+        btnSubmitExam.addEventListener('click', () => {
+            const answeredCount = Object.keys(state.userAnswers).length;
+            const total = state.questions.length;
+            const unanswered = total - answeredCount;
+
+            let msg = `Bạn đã hoàn tất ${answeredCount}/${total} câu hỏi.`;
+            if (unanswered > 0) {
+                msg += `\nCẢNH BÁO: Còn ${unanswered} câu chưa trả lời!`;
+            }
+            msg += "\nBạn có chắc chắn muốn nộp bài sát hạch?";
+
+            if (confirm(msg)) {
+                handleFinalSubmit();
+            }
+        });
+
+        function handleFinalSubmit() {
+            clearInterval(state.timerInterval);
+            state.isSubmitted = true;
+            state.endTime = new Date();
+
+            let correctCount = 0;
+            const currentExamWrongIds = [];
+            const currentExamCorrectIds = [];
+
+            state.questions.forEach((q, idx) => {
+                if (state.userAnswers[idx] === q.correct) {
+                    correctCount++;
+                    currentExamCorrectIds.push(q.id);
+                } else {
+                    currentExamWrongIds.push(q.id);
+                }
+            });
+
+            let savedWrongIds = getSavedWrongIds();
+            if (state.isRetryingWrong) {
+                savedWrongIds = savedWrongIds.filter(id => !currentExamCorrectIds.includes(id));
+                saveWrongIds(savedWrongIds);
+            } else {
+                const mergedWrongIds = Array.from(new Set([...savedWrongIds, ...currentExamWrongIds]));
+                saveWrongIds(mergedWrongIds);
+            }
+
+            const totalQ = state.questions.length;
+            const score = ((correctCount / totalQ) * 10).toFixed(1);
+            const durationSec = Math.round((state.endTime - state.startTime) / 1000);
+            const m = Math.floor(durationSec / 60);
+            const s = durationSec % 60;
+
+            const examTitle = state.isRetryingWrong 
+                ? "Bài Luyện Tập Câu Sai"
+                : (state.selectedSetKey === 'random' ? "Đề Ngẫu Nhiên" : `Bộ Đề ${String(state.selectedSetKey).padStart(2, '0')}`);
+
+            resStudentInfo.textContent = `Thí sinh: ${state.studentName} | ${examTitle}`;
+            resScore.textContent = score;
+            resCorrectCount.textContent = `${correctCount}/${totalQ}`;
+            resTimeTaken.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+            if (score >= 8.0) {
+                resBadgeStatus.textContent = "ĐẠT YÊU CẦU";
+                resBadgeStatus.className = "inline-block px-5 py-2 rounded-2xl text-sm font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
+            } else {
+                resBadgeStatus.textContent = "CHƯA ĐẠT";
+                resBadgeStatus.className = "inline-block px-5 py-2 rounded-2xl text-sm font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-300";
+            }
+
+            const totalRemainingWrong = getSavedWrongIds().length;
+            if (totalRemainingWrong > 0) {
+                resultWrongAlert.classList.remove('hidden');
+                resultWrongText.innerHTML = `Hiện tại kho câu hỏi sai đang có <b>${totalRemainingWrong}</b> câu cần được rèn luyện.`;
+                btnPracticeWrongResult.classList.remove('hidden');
+            } else {
+                resultWrongAlert.classList.remove('hidden');
+                resultWrongText.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check"></i> Tuyệt vời! Bạn không còn câu sai nào trong danh mục ôn tập.</span>`;
+                btnPracticeWrongResult.classList.add('hidden');
+            }
+
+            renderReviewSection();
+
+            examScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            syncToLocalhost({
+                studentName: state.studentName,
+                studentRole: state.studentRole,
+                examSet: examTitle,
+                score: parseFloat(score),
+                correctCount: correctCount,
+                totalQuestions: totalQ,
+                durationSeconds: durationSec,
+                submittedAt: new Date().toISOString()
+            });
+        }
+
+        /* ==================== 9. REVIEW CHI TIẾT ==================== */
+        function renderReviewSection() {
+            reviewList.innerHTML = '';
+            const letters = ["A", "B", "C", "D"];
+
+            state.questions.forEach((q, idx) => {
+                const userChoice = state.userAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+                const isSkipped = userChoice === undefined;
+
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-3xl border-2 transition ${
+                    isCorrect ? 'border-emerald-200 bg-white' : 'border-red-200 bg-red-50/20'
+                }`;
+
+                let badge = '';
+                if (isCorrect) {
+                    badge = '<span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-full flex items-center gap-1.5"><i class="fa-solid fa-check"></i> ĐÚNG</span>';
+                } else if (isSkipped) {
+                    badge = '<span class="px-3 py-1 bg-slate-200 text-slate-700 text-xs font-black rounded-full flex items-center gap-1.5"><i class="fa-solid fa-minus"></i> CHƯA CHỌN</span>';
+                } else {
+                    badge = '<span class="px-3 py-1 bg-red-100 text-red-800 text-xs font-black rounded-full flex items-center gap-1.5"><i class="fa-solid fa-xmark"></i> SAI</span>';
+                }
+
+                let optionsHtml = '';
+                q.options.forEach((optText, optIdx) => {
+                    let optStyle = "border-slate-200 bg-slate-50 text-slate-700";
+                    let marker = '';
+
+                    if (optIdx === q.correct) {
+                        optStyle = "border-emerald-500 bg-emerald-50 text-emerald-950 font-bold ring-1 ring-emerald-500";
+                        marker = '<i class="fa-solid fa-circle-check text-emerald-600 ml-auto"></i>';
+                    } else if (optIdx === userChoice && !isCorrect) {
+                        optStyle = "border-red-400 bg-red-50 text-red-900 font-semibold line-through";
+                        marker = '<i class="fa-solid fa-circle-xmark text-red-600 ml-auto"></i>';
+                    }
+
+                    optionsHtml += `
+                        <div class="p-3.5 rounded-xl border text-sm flex items-center gap-3 ${optStyle}">
+                            <span class="w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs bg-white/90 shrink-0 shadow-sm">${letters[optIdx]}</span>
+                            <span>${optText}</span>
+                            ${marker}
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="font-black text-sm text-slate-800">
+                            CÂU ${idx + 1} <span class="font-bold text-blue-600">(Đề cương gốc: Câu ${q.id})</span>
+                        </div>
+                        ${badge}
+                    </div>
+                    <p class="text-slate-900 font-bold mb-4 text-sm sm:text-base leading-relaxed">${q.q}</p>
+                    <div class="space-y-2.5 mb-4">
+                        ${optionsHtml}
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-900 font-semibold">
+                        <i class="fa-solid fa-check-double mr-1 text-emerald-600"></i> Đáp án chuẩn theo đề cương: Phương án <b>${letters[q.correct]}</b> (${q.options[q.correct]})
+                    </div>
+                `;
+
+                reviewList.appendChild(card);
+            });
+        }
+
+        /* ==================== 10. ĐỒNG BỘ LOCALHOST ==================== */
+        async function syncToLocalhost(dataPayload) {
+            serverSyncFeedback.innerHTML = `
+                <div class="flex items-center gap-2 text-slate-600">
+                    <i class="fa-solid fa-spinner fa-spin text-evnLight"></i>
+                    <span>Đang truyền gói tin kết quả tới máy chủ <code>${state.serverUrl}</code>...</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(state.serverUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataPayload)
+                });
+
+                if (response.ok) {
+                    serverSyncFeedback.innerHTML = `
+                        <div class="text-emerald-700 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Máy chủ localhost tiếp nhận kết quả thành công!</span>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (err) {
+                serverSyncFeedback.innerHTML = `
+                    <div class="text-slate-600 space-y-1">
+                        <div class="flex items-center gap-2 font-bold text-amber-700">
+                            <i class="fa-solid fa-circle-exclamation text-amber-600"></i>
+                            <span>Máy chủ nội bộ (${state.serverUrl}) đang Offline</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">
+                            Kết quả bài thi và danh mục các câu làm sai đã được ghi nhớ hoàn toàn tại trình duyệt này.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        btnScrollReview.addEventListener('click', () => {
+            document.getElementById('review-container').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        btnRestartQuiz.addEventListener('click', () => {
+            resultScreen.classList.add('hidden');
+            configScreen.classList.remove('hidden');
+            updateWrongCounterUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        updateWrongCounterUI();
+    </script>
+</body>
+</html>

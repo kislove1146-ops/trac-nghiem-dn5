@@ -66,23 +66,34 @@
                     HỆ THỐNG SÁT HẠCH TRỰC TUYẾN
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-                    10 Bộ Đề Sát Hạch Chuẩn Hóa 30 Câu - Bao Phủ Toàn Bộ Ngân Hàng Câu Hỏi
+                    7 Bộ Đề Sát Hạch Chuẩn Hóa 30 Câu - Bao Phủ Toàn Bộ 210 Câu Hỏi (Không Trùng Lặp)
                 </p>
             </div>
 
-            <!-- KHỐI QUẢN LÝ CÂU SAI -->
-            <div id="wrong-pool-box" class="mb-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div class="flex items-center gap-2.5 text-amber-900">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
-                    <span>Bạn đang có <b id="wrong-questions-count" class="text-red-600 text-sm">0</b> câu làm sai chưa ôn lại.</span>
-                </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" id="btn-practice-wrong-main" class="flex-1 sm:flex-none px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-rotate-left"></i> Làm lại câu sai
-                    </button>
-                    <button type="button" id="btn-clear-wrong-main" title="Xóa toàn bộ câu sai đã lưu" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+            <!-- KHỐI QUẢN LÝ CÂU SAI NÂNG CAO -->
+            <div id="wrong-pool-box" class="mb-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3 text-xs">
+                <div class="flex items-center justify-between gap-2 text-amber-900">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+                        <span>Bạn đang có <b id="wrong-questions-count" class="text-red-600 text-sm">0</b> câu làm sai chưa ôn lại.</span>
+                    </div>
+                    <button type="button" id="btn-clear-wrong-main" title="Xóa toàn bộ câu sai đã lưu" class="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-lg transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
                         <i class="fa-solid fa-trash-can"></i> Xóa
                     </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-amber-200/60">
+                    <button type="button" id="btn-practice-wrong-main" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-rotate-left"></i> Làm lại câu sai
+                    </button>
+                    <button type="button" id="btn-download-wrong-main" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold rounded-xl transition flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed" title="Tải file câu sai về máy tính">
+                        <i class="fa-solid fa-download text-evn"></i> Tải câu sai (.json)
+                    </button>
+                    <button type="button" id="btn-upload-wrong-trigger" class="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold rounded-xl transition flex items-center justify-center gap-1.5" title="Nạp file câu sai từ máy tính lên">
+                        <i class="fa-solid fa-upload text-emerald-600"></i> Nạp câu sai
+                    </button>
+                    <!-- Input file ẩn để import câu sai -->
+                    <input type="file" id="file-wrong-input" accept=".json" class="hidden">
                 </div>
             </div>
 
@@ -94,26 +105,26 @@
                 <!-- Chọn Bộ Đề Kiểm Tra -->
                 <div>
                     <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-2">
-                        Chọn Bộ Đề Kiểm Tra (Chuẩn 30 Câu / Đề)
+                        Chọn Bộ Đề Kiểm Tra (Chuẩn 30 Câu / Đề - Đã Xáo Trộn Ngẫu Nhiên)
                     </label>
                     <div class="relative">
                         <select id="quiz-select-mode" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-evnLight focus:border-transparent outline-none transition bg-white appearance-none cursor-pointer pr-10 shadow-sm">
-                            <option value="random">🎲 ĐỀ THI NGẪU NHIÊN (Tự động bốc ngẫu nhiên 30 câu từ toàn bộ ngân hàng)</option>
+                            <option value="random">🎲 ĐỀ THI NGẪU NHIÊN (Bốc 1 trong 7 đề, loại trừ đề vừa làm trong phiên)</option>
                             <option value="1">📋 BỘ ĐỀ 01 - Chuẩn 30 câu (Vận hành thiết bị & An toàn điện)</option>
-                            <option value="2">📋 BỘ ĐỀ 02 - Chuẩn 30 câu (Khí nén, Ổ đỡ & Quy trình Phiếu)</option>
-                            <option value="3">📋 BỘ ĐỀ 03 - Chuẩn 30 câu (Rơle Bảo vệ MBT, Máy phát & Trạm 220kV)</option>
-                            <option value="4">📋 BỘ ĐỀ 04 - Chuẩn 30 câu (Hệ thống Điều tốc & Kích từ ĐN5)</option>
-                            <option value="5">📋 BỘ ĐỀ 05 - Chuẩn 30 câu (Quy trình An toàn Điện EVN & Tiếp đất)</option>
-                            <option value="6">📋 BỘ ĐỀ 06 - Chuẩn 30 câu (Trình tự Bảo vệ Sự cố 40, 46, 51T, 59)</option>
-                            <option value="7">📋 BỘ ĐỀ 07 - Chuẩn 30 câu (Thao tác Thiết bị & Chế độ Vận hành)</option>
-                            <option value="8">📋 BỘ ĐỀ 08 - Chuẩn 30 câu (Quy trình Công tác Nhiều ngày & Di chuyển)</option>
-                            <option value="9">📋 BỘ ĐỀ 09 - Chuẩn 30 câu (Logic Khởi động Dừng máy & Tự dùng LCU)</option>
-                            <option value="10">📋 BỘ ĐỀ 10 - Chuẩn 30 câu (Tổng hợp Sát hạch Trưởng Kíp / ĐHV)</option>
+                            <option value="2">📋 BỘ ĐỀ 02 - Chuẩn 30 câu (Hồ chứa, Rơle bảo vệ & An toàn điện)</option>
+                            <option value="3">📋 BỘ ĐỀ 03 - Chuẩn 30 câu (Máy biến áp, Tiếp đất & An toàn điện)</option>
+                            <option value="4">📋 BỘ ĐỀ 04 - Chuẩn 30 câu (Tự dùng, Lệnh thao tác & An toàn điện)</option>
+                            <option value="5">📋 BỘ ĐỀ 05 - Chuẩn 30 câu (Sự cố Rơle, Di chuyển & An toàn điện)</option>
+                            <option value="6">📋 BỘ ĐỀ 06 - Chuẩn 30 câu (Logic Khởi/Dừng máy & An toàn điện)</option>
+                            <option value="7">📋 BỘ ĐỀ 07 - Chuẩn 30 câu (Chuyên đề Tổng hợp & An toàn điện)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
                             <i class="fa-solid fa-chevron-down text-xs"></i>
                         </div>
                     </div>
+                    <p id="session-random-info" class="text-[11px] text-blue-600 font-semibold mt-1.5 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info"></i> Phiên hiện tại: Còn <span id="session-remaining-count" class="font-bold">7</span>/7 đề ngẫu nhiên chưa thi.
+                    </p>
                 </div>
 
                 <!-- Thời Gian Làm Bài -->
@@ -257,12 +268,15 @@
                             <i class="fa-solid fa-circle-exclamation text-amber-600 mr-1.5"></i>
                             <span id="result-wrong-text">Hệ thống đã lưu các câu bạn làm sai vào danh sách ôn tập.</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" id="btn-practice-wrong-result" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center gap-1.5">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="btn-practice-wrong-result" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-rotate-left"></i> Làm lại ngay câu sai
                             </button>
+                            <button type="button" id="btn-download-wrong-result" class="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold rounded-xl transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-download text-evn"></i> Tải câu sai (.json)
+                            </button>
                             <button type="button" id="btn-clear-wrong-result" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold rounded-xl transition flex items-center gap-1">
-                                <i class="fa-solid fa-trash-can"></i> Xóa câu sai
+                                <i class="fa-solid fa-trash-can"></i> Xóa
                             </button>
                         </div>
                     </div>
@@ -523,7 +537,78 @@
             { id: 210, q: "[An toàn Đề 30] Trước khi cho đơn vị công tác vào làm việc ai chịu trách nhiệm giải thích về nội dung, trình tự thực hiện công việc và các biện pháp an toàn?", options: ["Người chỉ huy trực tiếp.", "Người cấp phiếu.", "Người lãnh đạo công việc.", "Người cho phép."], correct: 0 }
         ];
 
-        /* ==================== 2. QUẢN LÝ CÂU SAI ==================== */
+        /* ==================== 2. THUẬT TOÁN XÁO TRỘN FISHER-YATES ==================== */
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        /* ==================== 3. PHÂN CHIA 7 BỘ ĐỀ (30 CÂU/ĐỀ - KHÔNG TRÙNG NHAU) ==================== */
+        /*
+           Tổng 210 câu, 7 đề. Mỗi đề lấy đúng 30 câu đan xen theo bước nhảy 7:
+           Đề 1: index 0, 7, 14, 21, ..., 203 (30 câu)
+           Đề 2: index 1, 8, 15, 22, ..., 204 (30 câu)
+           ...
+           Đề 7: index 6, 13, 20, 27, ..., 209 (30 câu)
+           -> 7 đề rời nhau 100% (tổng đúng 210 câu, không trùng bất kỳ câu nào).
+           Mỗi đề đều có cả câu hỏi đầu (vận hành), giữa (rơle) và cuối (an toàn).
+        */
+        function getFixedSetQuestions(setNumber) {
+            const setIndex = setNumber - 1; // 0..6
+            const selected = [];
+            for (let i = 0; i < 30; i++) {
+                const qIdx = i * 7 + setIndex;
+                selected.push(MASTER_QUESTIONS[qIdx]);
+            }
+            // Xáo trộn thứ tự các câu hỏi trong đề để không bị theo thứ tự cố định
+            return shuffleArray(selected);
+        }
+
+        /* ==================== 4. QUẢN LÝ PHIÊN ĐỀ NGẪU NHIÊN ==================== */
+        const SESSION_RANDOM_KEY = 'dn5_remaining_random_sets';
+
+        function getRemainingRandomSets() {
+            try {
+                const raw = sessionStorage.getItem(SESSION_RANDOM_KEY);
+                if (raw !== null) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (e) {}
+            // Khởi tạo mới đủ 7 đề [1, 2, 3, 4, 5, 6, 7]
+            const initial = [1, 2, 3, 4, 5, 6, 7];
+            sessionStorage.setItem(SESSION_RANDOM_KEY, JSON.stringify(initial));
+            return initial;
+        }
+
+        function popRandomSet() {
+            let sets = getRemainingRandomSets();
+            let isCycleReset = false;
+
+            if (sets.length === 0) {
+                sets = [1, 2, 3, 4, 5, 6, 7];
+                isCycleReset = true;
+            }
+
+            const randIndex = Math.floor(Math.random() * sets.length);
+            const chosenSet = sets.splice(randIndex, 1)[0];
+            sessionStorage.setItem(SESSION_RANDOM_KEY, JSON.stringify(sets));
+
+            updateSessionRandomCounterUI();
+            return { chosenSet, remainingCount: sets.length, isCycleReset };
+        }
+
+        function updateSessionRandomCounterUI() {
+            const remainingCount = getRemainingRandomSets().length;
+            const counterEl = document.getElementById('session-remaining-count');
+            if (counterEl) counterEl.textContent = remainingCount;
+        }
+
+        /* ==================== 5. QUẢN LÝ CÂU SAI & XUẤT/NHẬP JSON ==================== */
         const WRONG_POOL_KEY = 'dn5_wrong_question_ids';
 
         function getSavedWrongIds() {
@@ -549,44 +634,94 @@
             const count = getSavedWrongIds().length;
             const counterEl = document.getElementById('wrong-questions-count');
             const btnPracticeMain = document.getElementById('btn-practice-wrong-main');
+            const btnDownloadMain = document.getElementById('btn-download-wrong-main');
             const btnClearMain = document.getElementById('btn-clear-wrong-main');
 
             if (counterEl) counterEl.textContent = count;
             if (btnPracticeMain) btnPracticeMain.disabled = (count === 0);
+            if (btnDownloadMain) btnDownloadMain.disabled = (count === 0);
             if (btnClearMain) btnClearMain.disabled = (count === 0);
         }
 
-        /* ==================== 3. THUẬT TOÁN PHÂN CHIA 10 BỘ ĐỀ ==================== */
-        function generateFixedSet(setNumber) {
-            const setIndex = setNumber - 1;
-            const total = MASTER_QUESTIONS.length;
-            const selected = [];
+        // Tải xuống file .json chứa câu sai
+        function exportWrongQuestions() {
+            const wrongIds = getSavedWrongIds();
+            if (wrongIds.length === 0) {
+                alert("Hiện tại không có câu sai nào trong danh sách để tải về!");
+                return;
+            }
+
+            const wrongData = MASTER_QUESTIONS.filter(q => wrongIds.includes(q.id));
+            const exportPayload = {
+                appName: "Hệ Thống Sát Hạch Trắc Nghiệm - NMTĐ Đồng Nai 5",
+                version: "2.0",
+                exportedAt: new Date().toISOString(),
+                totalQuestions: wrongIds.length,
+                wrongQuestionIds: wrongIds,
+                questionsSummary: wrongData.map(q => ({ id: q.id, question: q.q }))
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const now = new Date();
+            const timeTag = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
             
-            for (let i = 0; i < 30; i++) {
-                const questionIndex = (setIndex * 7 + i * 7) % total;
-                const q = MASTER_QUESTIONS[questionIndex];
-                if (!selected.some(item => item.id === q.id)) {
-                    selected.push(q);
-                }
-            }
-            let fillIndex = 0;
-            while (selected.length < 30) {
-                const candidate = MASTER_QUESTIONS[fillIndex % total];
-                if (!selected.some(item => item.id === candidate.id)) {
-                    selected.push(candidate);
-                }
-                fillIndex++;
-            }
-            return selected;
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `cau_sai_dn5_${timeTag}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
-        /* ==================== 4. APPLICATION STATE ==================== */
+        // Nạp file .json câu sai từ máy tính
+        function handleImportWrongQuestions(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedIds = [];
+
+                    if (Array.isArray(parsed)) {
+                        importedIds = parsed;
+                    } else if (Array.isArray(parsed.wrongQuestionIds)) {
+                        importedIds = parsed.wrongQuestionIds;
+                    } else if (Array.isArray(parsed.ids)) {
+                        importedIds = parsed.ids;
+                    } else {
+                        throw new Error("Tệp không đúng cấu trúc danh sách câu sai!");
+                    }
+
+                    // Lọc ID hợp lệ (1..210)
+                    const validIds = importedIds.filter(id => typeof id === 'number' && MASTER_QUESTIONS.some(q => q.id === id));
+                    if (validIds.length === 0) {
+                        alert("Không tìm thấy câu hỏi sai hợp lệ trong tệp tin!");
+                        return;
+                    }
+
+                    const currentSaved = getSavedWrongIds();
+                    const merged = Array.from(new Set([...currentSaved, ...validIds]));
+                    saveWrongIds(merged);
+
+                    alert(`Đã nạp thành công! Kho câu sai hiện có ${merged.length} câu (vừa thêm mới ${validIds.length} câu từ tệp).`);
+                } catch (err) {
+                    alert("Lỗi khi đọc tệp tin: Vui lòng chọn tệp .json hợp lệ do hệ thống xuất ra!");
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ==================== 6. APPLICATION STATE ==================== */
         let state = {
             studentName: 'Thí sinh',
             studentRole: 'Điều Hành Viên',
             selectedSetKey: '1',
             isRetryingWrong: false,
-            durationMinutes: 30,
+            durationMinutes: 45,
             serverUrl: 'http://localhost:5000/api/submit-quiz',
             
             questions: [],
@@ -600,7 +735,7 @@
             endTime: null
         };
 
-        /* ==================== 5. DOM REFERENCES ==================== */
+        /* ==================== 7. DOM REFERENCES ==================== */
         const configScreen = document.getElementById('config-screen');
         const examScreen = document.getElementById('exam-screen');
         const resultScreen = document.getElementById('result-screen');
@@ -638,12 +773,16 @@
         const resultWrongAlert = document.getElementById('result-wrong-alert');
         const resultWrongText = document.getElementById('result-wrong-text');
         const btnPracticeWrongResult = document.getElementById('btn-practice-wrong-result');
+        const btnDownloadWrongResult = document.getElementById('btn-download-wrong-result');
         const btnClearWrongResult = document.getElementById('btn-clear-wrong-result');
 
         const btnPracticeWrongMain = document.getElementById('btn-practice-wrong-main');
+        const btnDownloadWrongMain = document.getElementById('btn-download-wrong-main');
+        const btnUploadWrongTrigger = document.getElementById('btn-upload-wrong-trigger');
+        const fileWrongInput = document.getElementById('file-wrong-input');
         const btnClearWrongMain = document.getElementById('btn-clear-wrong-main');
 
-        /* ==================== 6. XỬ LÝ SỰ KIỆN CÂU SAI ==================== */
+        /* ==================== 8. XỬ LÝ SỰ KIỆN QUẢN LÝ CÂU SAI ==================== */
         btnClearWrongMain.addEventListener('click', () => {
             if (confirm("Bạn có chắc chắn muốn xóa sạch toàn bộ danh sách các câu làm sai đã lưu không? Sau khi xóa sẽ không lưu các câu này nữa.")) {
                 clearAllWrongIds();
@@ -658,6 +797,12 @@
                 alert("Đã xóa sạch danh sách câu sai!");
             }
         });
+
+        btnDownloadWrongMain.addEventListener('click', exportWrongQuestions);
+        btnDownloadWrongResult.addEventListener('click', exportWrongQuestions);
+
+        btnUploadWrongTrigger.addEventListener('click', () => fileWrongInput.click());
+        fileWrongInput.addEventListener('change', handleImportWrongQuestions);
 
         btnPracticeWrongMain.addEventListener('click', () => {
             const wrongIds = getSavedWrongIds();
@@ -680,8 +825,9 @@
         function startWrongPracticeExam(wrongIds) {
             state.isRetryingWrong = true;
             state.selectedSetKey = 'wrong_pool';
-            state.questions = MASTER_QUESTIONS.filter(q => wrongIds.includes(q.id));
-            state.durationMinutes = Math.max(5, Math.ceil(state.questions.length * 1));
+            // Lấy câu sai và xáo trộn ngẫu nhiên thứ tự khi ôn luyện
+            state.questions = shuffleArray(MASTER_QUESTIONS.filter(q => wrongIds.includes(q.id)));
+            state.durationMinutes = Math.max(5, Math.ceil(state.questions.length * 1.5));
             
             navExamName.textContent = `Bộ đề: Ôn Lại Câu Sai (${state.questions.length} câu)`;
             paletteExamId.textContent = "Đề Câu Sai";
@@ -689,21 +835,23 @@
             launchQuizUI();
         }
 
-        /* ==================== 7. KHỞI TẠO BÀI THI ==================== */
+        /* ==================== 9. KHỞI TẠO BÀI THI & CHỌN ĐỀ ==================== */
         setupForm.addEventListener('submit', (e) => {
             e.preventDefault();
             state.isRetryingWrong = false;
             state.selectedSetKey = document.getElementById('quiz-select-mode').value;
-            state.durationMinutes = parseInt(document.getElementById('quiz-duration').value, 10) || 30;
+            state.durationMinutes = parseInt(document.getElementById('quiz-duration').value, 10) || 45;
 
             if (state.selectedSetKey === 'random') {
-                const shuffled = [...MASTER_QUESTIONS].sort(() => 0.5 - Math.random());
-                state.questions = shuffled.slice(0, 30);
-                navExamName.textContent = "Bộ đề: Đề Ngẫu Nhiên (30 câu)";
-                paletteExamId.textContent = "Đề Ngẫu Nhiên";
+                const { chosenSet, remainingCount, isCycleReset } = popRandomSet();
+                state.questions = getFixedSetQuestions(chosenSet);
+                
+                let cycleNotice = isCycleReset ? " [Bắt đầu chu kỳ 7 đề mới]" : "";
+                navExamName.textContent = `Bộ đề: Ngẫu nhiên (Đã bốc Đề ${String(chosenSet).padStart(2, '0')})${cycleNotice}`;
+                paletteExamId.textContent = `Đề ${String(chosenSet).padStart(2, '0')} (Random)`;
             } else {
                 const setNum = parseInt(state.selectedSetKey, 10);
-                state.questions = generateFixedSet(setNum);
+                state.questions = getFixedSetQuestions(setNum);
                 navExamName.textContent = `Bộ đề: Đề ${String(setNum).padStart(2, '0')} (30 câu)`;
                 paletteExamId.textContent = `Đề ${String(setNum).padStart(2, '0')}`;
             }
@@ -957,10 +1105,12 @@
                 resultWrongAlert.classList.remove('hidden');
                 resultWrongText.innerHTML = `Hiện tại kho câu hỏi sai đang có <b>${totalRemainingWrong}</b> câu cần được rèn luyện.`;
                 btnPracticeWrongResult.classList.remove('hidden');
+                btnDownloadWrongResult.classList.remove('hidden');
             } else {
                 resultWrongAlert.classList.remove('hidden');
                 resultWrongText.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-circle-check"></i> Tuyệt vời! Bạn không còn câu sai nào trong danh mục ôn tập.</span>`;
                 btnPracticeWrongResult.classList.add('hidden');
+                btnDownloadWrongResult.classList.add('hidden');
             }
 
             renderReviewSection();
@@ -1096,10 +1246,13 @@
             resultScreen.classList.add('hidden');
             configScreen.classList.remove('hidden');
             updateWrongCounterUI();
+            updateSessionRandomCounterUI();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
+        // Khởi tạo các trạng thái ban đầu
         updateWrongCounterUI();
+        updateSessionRandomCounterUI();
     </script>
 </body>
 </html>

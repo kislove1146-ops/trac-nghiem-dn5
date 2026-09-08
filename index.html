@@ -66,7 +66,7 @@
                     HỆ THỐNG SÁT HẠCH TRỰC TUYẾN
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-                    7 Bộ Đề Sát Hạch Chuẩn Hóa 30 Câu - Bao Phủ Toàn Bộ 210 Câu Hỏi (Không Trùng Lặp)
+                    6 Bộ Đề Sát Hạch Chuẩn Hóa 31-32 Câu - Bao Phủ 190 Câu Hỏi (Đã Lọc 20 Câu Trùng Lặp)
                 </p>
             </div>
 
@@ -105,25 +105,24 @@
                 <!-- Chọn Bộ Đề Kiểm Tra -->
                 <div>
                     <label class="block text-xs sm:text-sm font-bold text-slate-800 mb-2">
-                        Chọn Bộ Đề Kiểm Tra (Chuẩn 30 Câu / Đề - Đã Xáo Trộn Ngẫu Nhiên)
+                        Chọn Bộ Đề Kiểm Tra (Chuẩn 31 - 32 Câu / Đề - Đã Xáo Trộn Ngẫu Nhiên)
                     </label>
                     <div class="relative">
                         <select id="quiz-select-mode" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-evnLight focus:border-transparent outline-none transition bg-white appearance-none cursor-pointer pr-10 shadow-sm">
-                            <option value="random">🎲 ĐỀ THI NGẪU NHIÊN (Bốc 1 trong 7 đề, loại trừ đề vừa làm trong phiên)</option>
-                            <option value="1">📋 BỘ ĐỀ 01 - Chuẩn 30 câu (Vận hành thiết bị & An toàn điện)</option>
-                            <option value="2">📋 BỘ ĐỀ 02 - Chuẩn 30 câu (Hồ chứa, Rơle bảo vệ & An toàn điện)</option>
-                            <option value="3">📋 BỘ ĐỀ 03 - Chuẩn 30 câu (Máy biến áp, Tiếp đất & An toàn điện)</option>
-                            <option value="4">📋 BỘ ĐỀ 04 - Chuẩn 30 câu (Tự dùng, Lệnh thao tác & An toàn điện)</option>
-                            <option value="5">📋 BỘ ĐỀ 05 - Chuẩn 30 câu (Sự cố Rơle, Di chuyển & An toàn điện)</option>
-                            <option value="6">📋 BỘ ĐỀ 06 - Chuẩn 30 câu (Logic Khởi/Dừng máy & An toàn điện)</option>
-                            <option value="7">📋 BỘ ĐỀ 07 - Chuẩn 30 câu (Chuyên đề Tổng hợp & An toàn điện)</option>
+                            <option value="random">🎲 ĐỀ THI NGẪU NHIÊN (Bốc 1 trong 6 đề, loại trừ đề vừa làm trong phiên)</option>
+                            <option value="1">📋 BỘ ĐỀ 01 - 32 câu (Vận hành thiết bị & An toàn điện)</option>
+                            <option value="2">📋 BỘ ĐỀ 02 - 32 câu (Hồ chứa, Rơle bảo vệ & An toàn điện)</option>
+                            <option value="3">📋 BỘ ĐỀ 03 - 32 câu (Máy biến áp, Tiếp đất & An toàn điện)</option>
+                            <option value="4">📋 BỘ ĐỀ 04 - 32 câu (Tự dùng, Lệnh thao tác & An toàn điện)</option>
+                            <option value="5">📋 BỘ ĐỀ 05 - 31 câu (Sự cố Rơle, Di chuyển & An toàn điện)</option>
+                            <option value="6">📋 BỘ ĐỀ 06 - 31 câu (Logic Khởi/Dừng máy & An toàn điện)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-500">
                             <i class="fa-solid fa-chevron-down text-xs"></i>
                         </div>
                     </div>
                     <p id="session-random-info" class="text-[11px] text-blue-600 font-semibold mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-circle-info"></i> Phiên hiện tại: Còn <span id="session-remaining-count" class="font-bold">7</span>/7 đề ngẫu nhiên chưa thi.
+                        <i class="fa-solid fa-circle-info"></i> Phiên hiện tại: Còn <span id="session-remaining-count" class="font-bold">6</span>/6 đề ngẫu nhiên chưa thi.
                     </p>
                 </div>
 
@@ -547,22 +546,26 @@
             return arr;
         }
 
-        /* ==================== 3. PHÂN CHIA 7 BỘ ĐỀ (30 CÂU/ĐỀ - KHÔNG TRÙNG NHAU) ==================== */
+        /* ==================== 3. PHÂN CHIA 6 BỘ ĐỀ (LOẠI 20 CÂU TRÙNG - 190 CÂU HOÀN TOÀN KHÔNG TRÙNG) ==================== */
+        // Danh sách 20 câu sau bị trùng lặp (giữ lại câu trước, loại câu sau)
+        const EXCLUDED_IDS = [55, 64, 68, 72, 84, 85, 95, 115, 127, 148, 180, 183, 184, 188, 190, 191, 193, 194, 198, 199];
+
+        // 190 câu hỏi thực tế đưa vào thi sát hạch (bảo toàn id gốc 1..210 để đối chiếu)
+        const ACTIVE_QUESTIONS = MASTER_QUESTIONS.filter(q => !EXCLUDED_IDS.includes(q.id));
+
         /*
-           Tổng 210 câu, 7 đề. Mỗi đề lấy đúng 30 câu đan xen theo bước nhảy 7:
-           Đề 1: index 0, 7, 14, 21, ..., 203 (30 câu)
-           Đề 2: index 1, 8, 15, 22, ..., 204 (30 câu)
-           ...
-           Đề 7: index 6, 13, 20, 27, ..., 209 (30 câu)
-           -> 7 đề rời nhau 100% (tổng đúng 210 câu, không trùng bất kỳ câu nào).
-           Mỗi đề đều có cả câu hỏi đầu (vận hành), giữa (rơle) và cuối (an toàn).
+           Tổng 190 câu được chia vào 6 đề:
+           - Đề 01 đến Đề 04: mỗi đề 32 câu (4 x 32 = 128 câu)
+           - Đề 05 và Đề 06: mỗi đề 31 câu (2 x 31 = 62 câu)
+           -> Tổng đúng 190 câu, đan xen theo bước nhảy 6, phủ đều toàn bộ chuyên đề.
         */
         function getFixedSetQuestions(setNumber) {
-            const setIndex = setNumber - 1; // 0..6
+            const setIndex = setNumber - 1; // 0..5
+            const targetCount = setNumber <= 4 ? 32 : 31;
             const selected = [];
-            for (let i = 0; i < 30; i++) {
-                const qIdx = i * 7 + setIndex;
-                selected.push(MASTER_QUESTIONS[qIdx]);
+            for (let i = 0; i < targetCount; i++) {
+                const qIdx = i * 6 + setIndex;
+                selected.push(ACTIVE_QUESTIONS[qIdx]);
             }
             // Xáo trộn thứ tự các câu hỏi trong đề để không bị theo thứ tự cố định
             return shuffleArray(selected);
@@ -579,8 +582,8 @@
                     if (Array.isArray(parsed)) return parsed;
                 }
             } catch (e) {}
-            // Khởi tạo mới đủ 7 đề [1, 2, 3, 4, 5, 6, 7]
-            const initial = [1, 2, 3, 4, 5, 6, 7];
+            // Khởi tạo mới đủ 6 đề [1, 2, 3, 4, 5, 6]
+            const initial = [1, 2, 3, 4, 5, 6];
             sessionStorage.setItem(SESSION_RANDOM_KEY, JSON.stringify(initial));
             return initial;
         }
@@ -590,7 +593,7 @@
             let isCycleReset = false;
 
             if (sets.length === 0) {
-                sets = [1, 2, 3, 4, 5, 6, 7];
+                sets = [1, 2, 3, 4, 5, 6];
                 isCycleReset = true;
             }
 
@@ -846,13 +849,13 @@
                 const { chosenSet, remainingCount, isCycleReset } = popRandomSet();
                 state.questions = getFixedSetQuestions(chosenSet);
                 
-                let cycleNotice = isCycleReset ? " [Bắt đầu chu kỳ 7 đề mới]" : "";
-                navExamName.textContent = `Bộ đề: Ngẫu nhiên (Đã bốc Đề ${String(chosenSet).padStart(2, '0')})${cycleNotice}`;
+                let cycleNotice = isCycleReset ? " [Bắt đầu chu kỳ 6 đề mới]" : "";
+                navExamName.textContent = `Bộ đề: Ngẫu nhiên (Đã bốc Đề ${String(chosenSet).padStart(2, '0')} - ${state.questions.length} câu)${cycleNotice}`;
                 paletteExamId.textContent = `Đề ${String(chosenSet).padStart(2, '0')} (Random)`;
             } else {
                 const setNum = parseInt(state.selectedSetKey, 10);
                 state.questions = getFixedSetQuestions(setNum);
-                navExamName.textContent = `Bộ đề: Đề ${String(setNum).padStart(2, '0')} (30 câu)`;
+                navExamName.textContent = `Bộ đề: Đề ${String(setNum).padStart(2, '0')} (${state.questions.length} câu)`;
                 paletteExamId.textContent = `Đề ${String(setNum).padStart(2, '0')}`;
             }
 
@@ -1092,7 +1095,7 @@
             resCorrectCount.textContent = `${correctCount}/${totalQ}`;
             resTimeTaken.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-            if (score >= 7.0) {
+            if (score >= 8.0) {
                 resBadgeStatus.textContent = "ĐẠT YÊU CẦU";
                 resBadgeStatus.className = "inline-block px-5 py-2 rounded-2xl text-sm font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
             } else {

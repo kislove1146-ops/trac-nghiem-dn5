@@ -258,16 +258,31 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-3 justify-center">
-                        <button id="btn-restart-quiz" type="button" class="px-6 py-2.5 bg-evn hover:bg-evnDark text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button id="btn-review-wrong" type="button" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow cursor-pointer">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>Xem Câu Làm Sai (<span id="wrong-count-badge">0</span>)</span>
+                        </button>
+                        <button id="btn-restart-quiz" type="button" class="px-6 py-2.5 bg-evn hover:bg-evnDark text-white rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow cursor-pointer">
                             <i class="fa-solid fa-rotate"></i> Làm Đề Khác
                         </button>
                     </div>
                 </div>
             </div>
 
-  
-
+            <!-- KHỐI XEM LẠI CÂU SAI -->
+            <div id="wrong-review-container" class="space-y-4 text-left hidden">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <h3 class="font-extrabold text-sm sm:text-base text-slate-800 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark text-rose-500"></i>
+                        <span>Danh Sách Câu Hỏi Làm Sai & Đáp Án Đúng</span>
+                    </h3>
+                    <span class="text-xs font-bold text-slate-500" id="wrong-review-summary"></span>
+                </div>
+                <div id="wrong-review-list" class="space-y-4">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
         </section>
 
     </main>
@@ -642,12 +657,14 @@
             const s = durationSec % 60;
 
             let correctCount = 0;
+            const wrongQuestions = [];
 
             // Chấm từng câu hỏi
             for (let i = 0; i < state.questions.length; i++) {
                 const q = state.questions[i];
                 const chosenIdx = state.userAnswers[i];
                 let isCorrect = false;
+                let correctOptIdx = -1;
 
                 // Xác định đáp án đúng bằng cách băm từng option để tìm option khớp với q.h
                 for (let optIdx = 0; optIdx < q.options.length; optIdx++) {
@@ -655,6 +672,7 @@
                     const testString = `${q.id}_${optIdx}_${candidateText.trim()}_${SALT}`;
                     const candidateHash = await sha256(testString);
                     if (candidateHash === q.h) {
+                        correctOptIdx = optIdx;
                         if (chosenIdx === optIdx) {
                             isCorrect = true;
                         }
@@ -662,7 +680,18 @@
                     }
                 }
 
-                if (isCorrect) correctCount++;
+                if (isCorrect) {
+                    correctCount++;
+                } else {
+                    wrongQuestions.push({
+                        qIndex: i + 1,
+                        q: q.q,
+                        options: q.options,
+                        chosenIdx: chosenIdx,
+                        correctOptIdx: correctOptIdx,
+                        category: q.category
+                    });
+                }
             }
 
             const total = state.questions.length;
@@ -684,9 +713,92 @@
                 badgeStatus.className = "inline-block px-5 py-2.5 rounded-2xl text-sm font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300";
             }
 
+            // Cập nhật số câu sai và danh sách xem lại câu sai
+            const wrongBadge = document.getElementById('wrong-count-badge');
+            if (wrongBadge) wrongBadge.textContent = wrongQuestions.length;
+            renderWrongReviewList(wrongQuestions);
+
             examScreen.classList.add('hidden');
             resultScreen.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Vẽ danh sách các câu làm sai và chỉ rõ đáp án đúng
+        function renderWrongReviewList(wrongList) {
+            const container = document.getElementById('wrong-review-container');
+            const listEl = document.getElementById('wrong-review-list');
+            const summaryEl = document.getElementById('wrong-review-summary');
+            if (!listEl) return;
+
+            // Mặc định ẩn khối review khi nạp bảng điểm
+            if (container) container.classList.add('hidden');
+
+            if (summaryEl) {
+                summaryEl.textContent = wrongList.length > 0 
+                    ? `Bạn làm sai ${wrongList.length} câu` 
+                    : `Không có câu sai nào!`;
+            }
+
+            if (wrongList.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-6 text-center text-emerald-800 bg-emerald-50 rounded-2xl font-bold border border-emerald-200">
+                        <i class="fa-solid fa-circle-check text-2xl mb-2 text-emerald-600 block"></i>
+                        🎉 Xuất sắc! Bạn đã trả lời đúng 100% tất cả các câu hỏi, không làm sai câu nào!
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = wrongList.map(item => {
+                const notAnswered = item.chosenIdx === undefined;
+                return `
+                    <div class="p-5 rounded-2xl border border-rose-200 bg-rose-50/40 space-y-3">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800">
+                                Câu ${item.qIndex} (${item.category === 'an_toan' ? 'An toàn điện' : 'Nghiệp vụ'})
+                            </span>
+                            <span class="text-rose-700 font-extrabold flex items-center gap-1">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                ${notAnswered ? 'CHƯA TRẢ LỜI' : 'TRẢ LỜI SAI'}
+                            </span>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-900 leading-relaxed">${item.q}</h4>
+                        <div class="space-y-2 text-xs">
+                            ${item.options.map((opt, optIdx) => {
+                                const isCorrect = optIdx === item.correctOptIdx;
+                                const isChosen = optIdx === item.chosenIdx;
+
+                                let style = "p-3 rounded-xl border flex items-center justify-between gap-2 ";
+                                let badge = "";
+
+                                if (isCorrect) {
+                                    style += "bg-emerald-100 border-emerald-400 text-emerald-950 font-bold shadow-sm";
+                                    badge = `<span class="px-2.5 py-1 rounded-md text-[11px] bg-emerald-600 text-white font-black shrink-0">✓ ĐÁP ÁN ĐÚNG</span>`;
+                                } else if (isChosen) {
+                                    style += "bg-rose-100 border-rose-300 text-rose-950 font-bold shadow-sm";
+                                    badge = `<span class="px-2.5 py-1 rounded-md text-[11px] bg-rose-600 text-white font-black shrink-0">✗ BẠN ĐÃ CHỌN</span>`;
+                                } else {
+                                    style += "bg-white border-slate-200 text-slate-600";
+                                }
+
+                                return `<div class="${style}"><span>${opt}</span>${badge}</div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Bật / tắt hiển thị danh sách câu sai
+        const btnReviewWrong = document.getElementById('btn-review-wrong');
+        if (btnReviewWrong) {
+            btnReviewWrong.addEventListener('click', () => {
+                const box = document.getElementById('wrong-review-container');
+                if (box) {
+                    box.classList.toggle('hidden');
+                    box.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         }
 
         document.getElementById('btn-restart-quiz').addEventListener('click', () => {

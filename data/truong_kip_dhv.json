@@ -1851,7 +1851,7 @@
     "options": [
       "A. Áp lực nước làm mát gió máy phát và làm mát dầu các ổ bình thường",
       "B. Áp lực nước làm mát mát dầu các ổ bình thường",
-      "C. Áp lực nước làm mát gió máy phát và làm mát dầu ổ HTren bình thường",
+      "C. Áp lực nước làm mát gió máy phát và làm mát dầu ổ hướng trên bình thường",
       "D. Áp lực nước làm mát gió máy phát bình thường"
     ],
     "h": "d366138692113899831426a5c65b5b6a5cc789d15db177435d3db61e89e35c38"
@@ -1901,10 +1901,10 @@
     "category": "nghiep_vu",
     "q": "Điều kiện để cắt GCB khi đang dừng tổ máy từ chế độ phát?",
     "options": [
-      "A. Công suất P<1.5MW; - Công suất",
-      "B. - Công suất P<2MW; - Công suất",
-      "C. - Công suất P<2MW; - Công suất",
-      "D. Công suất P<2MW; - Công suất Q<2MVAR. Hoặc cánh hướng đóng về không tải Q<2MVAR Q<2.5MVAR. Hoặc cánh hướng đóng về không tải Q<1.5MVAR. Hoặc cánh hướng đóng về không tải"
+      "A. Công suất P<1.5MW; - Công suất Q<2MVAR. Hoặc cánh hướng đóng về không tải",
+      "B. - Công suất P<2MW; - Công suất Q<2MVAR",
+      "C. - Công suất P<2MW; - Công suất Q<2.5MVAR. Hoặc cánh hướng đóng về không tải",
+      "D. Công suất P<2MW; - Q<1.5MVAR. Hoặc cánh hướng đóng về không tải"
     ],
     "h": "880ad488dd7bdc716c97d493371f56734cdd8bfe18fe257599c261581c42fa47"
   },
@@ -1953,10 +1953,10 @@
     "category": "nghiep_vu",
     "q": "Trình tự tác động tổ máy khi bị sự cố 78 – bảo vệ mất đồng bộ?",
     "options": [
-      "A. - Cắt GCB - Cắt FCB;",
-      "B. - Cắt GCB; - Cắt FCB;",
-      "C. - Cắt GCB; - Cắt FCB;",
-      "D. - Cắt GCB; - Tổ máy về Noload. - Dừng sự cố điện. - Tổ máy về Novolt. - Tổ máy về Noload."
+      "A. - Cắt GCB - Cắt FCB; Dừng sự cố điện.",
+      "B. - Cắt GCB; - Cắt FCB; Tổ máy về Novolt.",
+      "C. - Cắt GCB; - Cắt FCB;Tổ máy về Noload.",
+      "D. - Cắt GCB; - Tổ máy về Noload."
     ],
     "h": "8d199bc7c6c9b3298766dd654d6b4670d690b5555556888d4a4ae7cb66173242"
   },
@@ -2005,10 +2005,10 @@
     "category": "nghiep_vu",
     "q": "Trình tự tác động tổ máy khi bị sự cố 51T – bảo vệ quá dòng máy biến thế chính T1?",
     "options": [
-      "A. - Cắt 901, FCB - Cắt MC 271,273,",
-      "B. - Cắt 901, FCB - Cắt MC 271,273,Dừng sự cố điện.",
+      "A. - Cắt 901, FCB - Cắt MC 271,273,Q01",
+      "B. - Cắt 901, FCB - Cắt MC 271,273,QFB1; Dừng sự cố điện.",
       "C. - Cắt 901 - Cắt MC 271,273;- Tổ máy về Noload.",
-      "D. - Cắt 901, FCB - Cắt MC 271,273; Q01 QFB1;- Tổ máy về Novolt"
+      "D. - Cắt 901, FCB - Cắt MC 271,273;Tổ máy về Novolt"
     ],
     "h": "e4f7d14685ce84d0044b5bcfae9247759f76141f2db98cbe808495c6c028cace"
   },

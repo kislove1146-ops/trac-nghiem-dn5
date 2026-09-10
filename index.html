@@ -417,7 +417,7 @@
             return shuffle([...selectedNv, ...selectedAt]);
         }
 
-        // Hàm bốc bộ đề chuẩn: 24 Nghiệp vụ + 6 An toàn theo bước nhảy so le (stride) chống liên tiếp
+        // Hàm bốc bộ đề chuẩn: 24 Nghiệp vụ + 6 An toàn CỐ ĐỊNH 100% theo từng bộ đề
         function pickStructuredSet(bank, setNumber, totalSets) {
             const nvBank = bank.filter(q => q.category === 'nghiep_vu');
             const atBank = bank.filter(q => q.category === 'an_toan');
@@ -426,7 +426,7 @@
             const nvTarget = 24;
             const atTarget = 6;
 
-            // 1. Lấy câu Nghiệp vụ theo bước nhảy so le (stride = totalSets)
+            // 1. Lấy 24 câu Nghiệp vụ cố định theo bước nhảy so le (stride = totalSets)
             let selectedNv = [];
             for (let i = 0; i < nvBank.length; i++) {
                 if (i % totalSets === setIndex) {
@@ -435,42 +435,42 @@
                 }
             }
 
-            // Bù thêm ngẫu nhiên nếu bộ đề cuối chưa đủ 24 câu Nghiệp vụ
+            // Bù cố định nếu bộ đề cuối chưa đủ 24 câu Nghiệp vụ (lấy từ các câu NV khác chưa dùng)
             if (selectedNv.length < nvTarget) {
                 const selectedNvIds = new Set(selectedNv.map(q => q.id));
                 const remainingNv = nvBank.filter(q => !selectedNvIds.has(q.id));
-                const shuffledRemaining = [...remainingNv].sort(() => 0.5 - Math.random());
                 const needed = nvTarget - selectedNv.length;
-                selectedNv = selectedNv.concat(shuffledRemaining.slice(0, needed));
+                selectedNv = selectedNv.concat(remainingNv.slice(0, needed));
             }
 
-            // 2. Lấy câu An toàn theo bước nhảy so le (stride = totalSets)
+            // 2. Lấy đúng 6 câu An toàn CỐ ĐỊNH 100% theo chu kỳ (30 câu chia đều cho các bộ):
+            // Bộ 1: câu 1-6 (chỉ số 0..5)
+            // Bộ 2: câu 7-12 (chỉ số 6..11)
+            // Bộ 3: câu 13-18 (chỉ số 12..17)
+            // Bộ 4: câu 19-24 (chỉ số 18..23)
+            // Bộ 5: câu 25-30 (chỉ số 24..29)
+            // Bộ 6..9: xoay vòng tiếp tục cố định
             let selectedAt = [];
-            for (let i = 0; i < atBank.length; i++) {
-                if (i % totalSets === setIndex) {
-                    selectedAt.push(atBank[i]);
-                    if (selectedAt.length === atTarget) break;
-                }
+            const atStart = (setIndex * atTarget) % atBank.length;
+            for (let i = 0; i < atTarget; i++) {
+                const idx = (atStart + i) % atBank.length;
+                selectedAt.push(atBank[idx]);
             }
 
-            // Bù thêm ngẫu nhiên cho đủ 6 câu An toàn
-            if (selectedAt.length < atTarget) {
-                const selectedAtIds = new Set(selectedAt.map(q => q.id));
-                const remainingAt = atBank.filter(q => !selectedAtIds.has(q.id));
-                const shuffledRemainingAt = [...remainingAt].sort(() => 0.5 - Math.random());
-                const needed = atTarget - selectedAt.length;
-                if (shuffledRemainingAt.length >= needed) {
-                    selectedAt = selectedAt.concat(shuffledRemainingAt.slice(0, needed));
-                } else {
-                    selectedAt = selectedAt.concat(shuffledRemainingAt);
-                    const stillNeeded = atTarget - selectedAt.length;
-                    const randomAt = [...atBank].sort(() => 0.5 - Math.random()).slice(0, stillNeeded);
-                    selectedAt = selectedAt.concat(randomAt);
+            // 3. Ghép đề thi đan xen cố định: Cứ 4 câu Nghiệp vụ thì đến 1 câu An toàn
+            // Để mỗi lần mở cùng một bộ đề, danh sách câu hỏi luôn CỐ ĐỊNH 100% từng câu một!
+            const examQuestions = [];
+            let nvIdx = 0;
+            let atIdx = 0;
+            for (let i = 0; i < atTarget; i++) {
+                // 4 câu Nghiệp vụ
+                for (let k = 0; k < 4; k++) {
+                    if (nvIdx < selectedNv.length) examQuestions.push(selectedNv[nvIdx++]);
                 }
+                // 1 câu An toàn
+                if (atIdx < selectedAt.length) examQuestions.push(selectedAt[atIdx++]);
             }
-
-            // Xáo trộn ngẫu nhiên thứ tự 30 câu trong bài thi để Nghiệp vụ và An toàn xen kẽ
-            return [...selectedNv, ...selectedAt].sort(() => 0.5 - Math.random());
+            return examQuestions;
         }
 
         function launchExam() {

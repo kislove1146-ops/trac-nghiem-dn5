@@ -92,14 +92,17 @@
                     </label>
                     <div class="relative">
                         <select id="quiz-mode-select" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-evnLight outline-none transition bg-white cursor-pointer pr-10 shadow-sm">
-                            <option value="random" selected>🎲 ĐỀ THI NGẪU NHIÊN </option>
-                            <option value="all">📚 TOÀN BỘ NGÂN HÀNG CÂU HỎI (Luyện tập tất cả các câu)</option>
-                            <option value="1">📋 BỘ ĐỀ 01 </option>
-                            <option value="2">📋 BỘ ĐỀ 02 </option>
-                            <option value="3">📋 BỘ ĐỀ 03 </option>
-                            <option value="4">📋 BỘ ĐỀ 04</option>
-                            <option value="5">📋 BỘ ĐỀ 05</option>
-                            <option value="6">📋 BỘ ĐỀ 06</option>
+                            <option value="random" selected>🎲 ĐỀ THI NGẪU NHIÊN</option>
+                            <option value="all">📚 TOÀN BỘ NGÂN HÀNG CÂU HỎI</option>
+                            <option value="1">📋 BỘ ĐỀ 1</option>
+                            <option value="2">📋 BỘ ĐỀ 2</option>
+                            <option value="3">📋 BỘ ĐỀ 3</option>
+                            <option value="4">📋 BỘ ĐỀ 4</option>
+                            <option value="5">📋 BỘ ĐỀ 5</option>
+                            <option value="6">📋 BỘ ĐỀ 6</option>
+                            <option value="7">📋 BỘ ĐỀ 7</option>
+                            <option value="8">📋 BỘ ĐỀ 8</option>
+                            <option value="9">📋 BỘ ĐỀ 9</option>
                         </select>
                        
                     </div>
@@ -328,6 +331,29 @@
         const flagIcon = document.getElementById('flag-icon');
         const flagText = document.getElementById('flag-text');
 
+        // Cập nhật danh sách bộ đề theo chức danh đã chọn
+        function updateQuizModes() {
+            const role = quizRoleSelect.value;
+            const totalSets = role === 'truong_ca' ? 9 : 7;
+            const currentVal = quizModeSelect.value;
+
+            let html = `
+                <option value="random">🎲 ĐỀ THI NGẪU NHIÊN</option>
+                <option value="all">📚 TOÀN BỘ NGÂN HÀNG CÂU HỎI</option>
+            `;
+            for (let i = 1; i <= totalSets; i++) {
+                html += `<option value="${i}">📋 BỘ ĐỀ ${i}</option>`;
+            }
+            quizModeSelect.innerHTML = html;
+            if (currentVal === 'all' || currentVal === 'random' || (parseInt(currentVal, 10) <= totalSets)) {
+                quizModeSelect.value = currentVal;
+            } else {
+                quizModeSelect.value = 'random';
+            }
+        }
+        quizRoleSelect.addEventListener('change', updateQuizModes);
+        updateQuizModes();
+
         // Khi bấm bắt đầu làm bài
         quizSetupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -348,14 +374,16 @@
                 if (!res.ok) throw new Error(`Không thể tải file dữ liệu ./data/${fileName} (Mã lỗi ${res.status})`);
                 const fullBank = await res.json();
 
+                const totalSets = role === 'truong_ca' ? 9 : 7;
+
                 // Lọc đề theo chế độ
                 if (mode === 'all') {
                     state.questions = fullBank;
                 } else if (mode === 'random') {
-                    state.questions = pickRandomExam(fullBank, 26, 6);
+                    state.questions = pickRandomExam(fullBank, 24, 6);
                 } else {
                     const setNum = parseInt(mode, 10);
-                    state.questions = pickFixedSet(fullBank, setNum);
+                    state.questions = pickStructuredSet(fullBank, setNum, totalSets);
                 }
 
                 launchExam();
@@ -378,16 +406,60 @@
             return shuffle([...selectedNv, ...selectedAt]);
         }
 
-        // Hàm bốc bộ đề cố định
-        function pickFixedSet(bank, setNumber) {
-            const setIndex = (setNumber - 1) % 6;
-            const targetCount = setIndex < 4 ? 32 : 31;
-            const res = [];
-            for (let i = 0; i < targetCount; i++) {
-                const idx = i * 6 + setIndex;
-                if (idx < bank.length) res.push(bank[idx]);
+        // Hàm bốc bộ đề chuẩn: 24 Nghiệp vụ + 6 An toàn theo bước nhảy so le (stride) chống liên tiếp
+        function pickStructuredSet(bank, setNumber, totalSets) {
+            const nvBank = bank.filter(q => q.category === 'nghiep_vu');
+            const atBank = bank.filter(q => q.category === 'an_toan');
+
+            const setIndex = setNumber - 1; // 0 đến totalSets - 1
+            const nvTarget = 24;
+            const atTarget = 6;
+
+            // 1. Lấy câu Nghiệp vụ theo bước nhảy so le (stride = totalSets)
+            let selectedNv = [];
+            for (let i = 0; i < nvBank.length; i++) {
+                if (i % totalSets === setIndex) {
+                    selectedNv.push(nvBank[i]);
+                    if (selectedNv.length === nvTarget) break;
+                }
             }
-            return res.sort(() => 0.5 - Math.random());
+
+            // Bù thêm ngẫu nhiên nếu bộ đề cuối chưa đủ 24 câu Nghiệp vụ
+            if (selectedNv.length < nvTarget) {
+                const selectedNvIds = new Set(selectedNv.map(q => q.id));
+                const remainingNv = nvBank.filter(q => !selectedNvIds.has(q.id));
+                const shuffledRemaining = [...remainingNv].sort(() => 0.5 - Math.random());
+                const needed = nvTarget - selectedNv.length;
+                selectedNv = selectedNv.concat(shuffledRemaining.slice(0, needed));
+            }
+
+            // 2. Lấy câu An toàn theo bước nhảy so le (stride = totalSets)
+            let selectedAt = [];
+            for (let i = 0; i < atBank.length; i++) {
+                if (i % totalSets === setIndex) {
+                    selectedAt.push(atBank[i]);
+                    if (selectedAt.length === atTarget) break;
+                }
+            }
+
+            // Bù thêm ngẫu nhiên cho đủ 6 câu An toàn
+            if (selectedAt.length < atTarget) {
+                const selectedAtIds = new Set(selectedAt.map(q => q.id));
+                const remainingAt = atBank.filter(q => !selectedAtIds.has(q.id));
+                const shuffledRemainingAt = [...remainingAt].sort(() => 0.5 - Math.random());
+                const needed = atTarget - selectedAt.length;
+                if (shuffledRemainingAt.length >= needed) {
+                    selectedAt = selectedAt.concat(shuffledRemainingAt.slice(0, needed));
+                } else {
+                    selectedAt = selectedAt.concat(shuffledRemainingAt);
+                    const stillNeeded = atTarget - selectedAt.length;
+                    const randomAt = [...atBank].sort(() => 0.5 - Math.random()).slice(0, stillNeeded);
+                    selectedAt = selectedAt.concat(randomAt);
+                }
+            }
+
+            // Xáo trộn ngẫu nhiên thứ tự 30 câu trong bài thi để Nghiệp vụ và An toàn xen kẽ
+            return [...selectedNv, ...selectedAt].sort(() => 0.5 - Math.random());
         }
 
         function launchExam() {
@@ -548,7 +620,7 @@
             });
         }
 
-        btnSubmitExam.addEventListener('click', () => {
+        btnSubmitExam.addEventListener('click', async () => {
             const answered = Object.keys(state.userAnswers).length;
             const total = state.questions.length;
             const remain = total - answered;
@@ -556,7 +628,12 @@
             if (remain > 0) msg += `\nCảnh báo: Còn ${remain} câu chưa trả lời!`;
             msg += `\nBạn có chắc chắn muốn nộp bài?`;
             if (confirm(msg)) {
-                submitExam();
+                try {
+                    await submitExam();
+                } catch (err) {
+                    alert("Lỗi khi nộp bài: " + err.message);
+                    console.error("Lỗi nộp bài:", err);
+                }
             }
         });
 

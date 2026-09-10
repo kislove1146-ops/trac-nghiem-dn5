@@ -93,7 +93,6 @@
                     <div class="relative">
                         <select id="quiz-mode-select" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-evnLight outline-none transition bg-white cursor-pointer pr-10 shadow-sm">
                             <option value="random" selected>🎲 ĐỀ THI NGẪU NHIÊN</option>
-                            <option value="all">📚 TOÀN BỘ NGÂN HÀNG CÂU HỎI</option>
                             <option value="1">📋 BỘ ĐỀ 1</option>
                             <option value="2">📋 BỘ ĐỀ 2</option>
                             <option value="3">📋 BỘ ĐỀ 3</option>
@@ -339,13 +338,12 @@
 
             let html = `
                 <option value="random">🎲 ĐỀ THI NGẪU NHIÊN</option>
-                <option value="all">📚 TOÀN BỘ NGÂN HÀNG CÂU HỎI</option>
             `;
             for (let i = 1; i <= totalSets; i++) {
                 html += `<option value="${i}">📋 BỘ ĐỀ ${i}</option>`;
             }
             quizModeSelect.innerHTML = html;
-            if (currentVal === 'all' || currentVal === 'random' || (parseInt(currentVal, 10) <= totalSets)) {
+            if (currentVal === 'random' || (parseInt(currentVal, 10) <= totalSets)) {
                 quizModeSelect.value = currentVal;
             } else {
                 quizModeSelect.value = 'random';
@@ -377,9 +375,7 @@
                 const totalSets = role === 'truong_ca' ? 9 : 7;
 
                 // Lọc đề theo chế độ
-                if (mode === 'all') {
-                    state.questions = fullBank;
-                } else if (mode === 'random') {
+                if (mode === 'random') {
                     state.questions = pickRandomExam(fullBank, 24, 6);
                 } else {
                     const setNum = parseInt(mode, 10);

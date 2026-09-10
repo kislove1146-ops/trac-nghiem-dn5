@@ -2082,7 +2082,7 @@
     "category": "an_toan",
     "q": "Tiếp đất nơi làm việc có cắt điện thì phải thực hiện như thế nào?",
     "options": [
-      "A. Phải tiếp đất ngay sau khi thử hết điện. Đá p án",
+      "A. Phải tiếp đất ngay sau khi thử hết điện.",
       "B. Tiếp đất ở tất cả các pha của thiết bị về phía có khả năng dẫn điện đến",
       "C. Đảm bảo khoảng cách an toàn đối với phần còn mang điện và đảm bảo cho toàn bộ đơn vị công tác nằm trọn trong vùng bảo vệ của nối đất.",
       "D. Cả A, B, C."
@@ -2119,7 +2119,7 @@
     "id": 164,
     "raw_id": 9,
     "category": "an_toan",
-    "q": "Những biện pháp kỹ thuật chuẩn bị nơi làm việc phải cắt điện bao gồm. 1. Cắt điện và ngăn chặn có điện trở lại nơi làm việc. Đá p án 2. Đặt (làm) tiếp đất. 3. Kiểm tra không còn điện. 4. Đặt (làm) rào chắn; treo biển báo, tín hiệu. Nếu cắt điện hoàn toàn thì không phải làm rào chắn.",
+    "q": "Những biện pháp kỹ thuật chuẩn bị nơi làm việc phải cắt điện bao gồm. 1. Cắt điện và ngăn chặn có điện trở lại nơi làm việc. 2. Đặt (làm) tiếp đất. 3. Kiểm tra không còn điện. 4. Đặt (làm) rào chắn; treo biển báo, tín hiệu. Nếu cắt điện hoàn toàn thì không phải làm rào chắn.",
     "options": [
       "A. Theo trình tự 1-2-3-4.",
       "B. Theo trình tự 1-3-2-4.",
@@ -2160,7 +2160,7 @@
     "category": "an_toan",
     "q": "Theo quy trình an toàn điện, phiếu công tác được quy định như thế nào là đúng.",
     "options": [
-      "A. Là giấy giao nhiệm vụ làm việc ở thiết bị điện. Đá p án",
+      "A. Là giấy giao nhiệm vụ làm việc ở thiết bị điện.",
       "B. Là giấy cho phép đơn vị công tác làm việc với thiết bị điện và phòng ngừa để không xảy ra tai nạn điện.",
       "C. Là giấy ghi những biện pháp đảm bảo an toàn khi làm việc ở thiết bị điện.",
       "D. Cả A, B và C."
@@ -2202,7 +2202,7 @@
       "A. Phải cấp phiếu công tác mới cho công việc đó.",
       "B. Người chỉ huy trực tiếp tổ chức biện pháp an toàn để thực hiện, ghi thêm vào phiếu đang làm.",
       "C. Người chỉ huy trực tiếp báo cho người cho phép biết và tổ chức biện pháp an toàn để thực hiện, đồng thời ghi thêm vào phiếu đang công tác.",
-      "D. Cả A và C. Đá p án"
+      "D. Cả A và C."
     ],
     "h": "58bc327ad09ee6fb3811f1d2ce142de4e32b5030682f1dc96f435a17323f6eaf"
   },
@@ -2240,7 +2240,7 @@
     "options": [
       "A. Phần thiết bị tiến hành công việc phải được nhìn thấy rõ đã cách ly khỏi các phần có điện từ mọi phía bằng cách cắt dao cách ly, tháo cầu chì, tháo đầu cáp, tháo dây dẫn (trừ trạm GIS).",
       "B. Cấm cắt điện để làm việc chỉ bằng máy cắt, dao phụ tải và dao cách ly có bộ truyền động tự động.",
-      "C. Phải ngăn chặn được những nguồn điện cao, hạ áp qua các máy biến áp lực, máy biến áp đo lường, máy phát điện khác có điện ngược trở lại Đá p án gây nguy hiểm cho người làm việc.",
+      "C. Phải ngăn chặn được những nguồn điện cao, hạ áp qua các máy biến áp lực, máy biến áp đo lường, máy phát điện khác có điện ngược trở lại gây nguy hiểm cho người làm việc.",
       "D. Thực hiện theo cả A, B và C."
     ],
     "h": "9e987bf31cddb9040ecc45072d254ba4091a7566ad530aa05abd249103f547d4"
@@ -2277,7 +2277,7 @@
     "category": "an_toan",
     "q": "Biện pháp tổ chức để đảm bảo an toàn khi làm việc ở thiết bị điện bao gồm.",
     "options": [
-      "A. Khảo sát, lập biên bản hiện trường (nếu cần thiết). Đá p án",
+      "A. Khảo sát, lập biên bản hiện trường (nếu cần thiết).",
       "B. Đăng ký công tác.",
       "C. Làm việc theo Phiếu công tác hoặc Lệnh công tác.",
       "D. Khảo sát, lập biên bản hiện trường (nếu cần thiết). Đăng ký công tác. Làm việc theo Phiếu công tác hoặc Lệnh công tác."
@@ -2316,7 +2316,7 @@
     "category": "an_toan",
     "q": "Trách nhiệm của người chỉ huy trực tiếp.",
     "options": [
-      "A. Chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc; kiểm tra sơ bộ tình trạng sức khỏe, trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác. Đá p án",
+      "A. Chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc; kiểm tra sơ bộ tình trạng sức khỏe, trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác.",
       "B. Phân công người chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc; kiểm tra sơ bộ tình trạng sức khỏe, trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác.",
       "C. Chuẩn bị, kiểm tra chất lượng của các dụng cụ, trang bị an toàn sử dụng trong khi làm việc; kiểm tra trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác.",
       "D. Phân công người chuẩn bị, kiểm tra chất lượng của các dụng cụ sử dụng trong khi làm việc; kiểm tra sơ bộ tình trạng sức khỏe, trang bị phương tiện bảo vệ cá nhân của nhân viên đơn vị công tác."
@@ -2343,7 +2343,7 @@
     "q": "Khi tạm ngừng công việc trong ngày để nghỉ giải lao (ăn trưa), đối với công việc cắt điện từng phần hoặc không cắt điện.",
     "options": [
       "A. Phải rút toàn bộ đơn vị công tác ra khỏi nơi làm việc, các biện pháp an toàn vẫn giữ nguyên, chỉ được vào làm việc trở lại khi được sự đồng ý của người chỉ huy trực tiếp hoặc người giám sát sau khi kiểm tra còn đấy đủ các biện pháp an toàn.",
-      "B. Phải rút toàn bộ đơn vị công tác ra khỏi nơi làm việc, thao gỡ các Đá p án biện pháp an toàn.",
+      "B. Phải rút toàn bộ đơn vị công tác ra khỏi nơi làm việc, thao gỡ các biện pháp an toàn.",
       "C. Đơn vị công tác nghỉ ăn trưa tại chỗ, các biện pháp an toàn phải giữ nguyên.",
       "D. Phải trả lai vị trí công tác cho người cho phép."
     ],
@@ -2382,7 +2382,7 @@
     "q": "Khi được phân công làm nhiệm vụ giám sát an toàn điện đội công tác, người giám sát?",
     "options": [
       "A. Có thể uỷ quyền cho công nhân bậc cao trong đội công tác thực hiện nhiệm vụ giám sát thay.",
-      "B. Phải luôn luôn có mặt tại nơi đội công tác làm việc. Đá p án",
+      "B. Phải luôn luôn có mặt tại nơi đội công tác làm việc.",
       "C. Có thể vắng mặt trong thời gian ngắn.",
       "D. Không phải thực hiện giám sát."
     ],

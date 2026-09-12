@@ -1285,7 +1285,7 @@
     "h": "8373a8ad7eda29369802466fe4ce7236ff4053764398a63d255f64b5883fb078"
   },
   {
-    "id": 100,
+   "id": 100,
     "raw_id": 100,
     "category": "nghiep_vu",
     "q": "Trình tự tác động tổ máy khi bị sự cố 49G – bảo vệ quá tải máy phát?",
@@ -1295,7 +1295,7 @@
       "C. Cắt GCB; Cắt FCB; Tổ máy về Noload.",
       "D. Cắt GCB; Tổ máy về Noload"
     ],
-    "h": "e58631952a42f511b3a211110d164fae6aa5535c19059181ea1fdd6eceb7f85e"
+    "h": "ab387fdcc4a504b93bc7b2a8133a6eca119bf5270ccb1787f555142f330fe541"
   },
   {
     "id": 101,
